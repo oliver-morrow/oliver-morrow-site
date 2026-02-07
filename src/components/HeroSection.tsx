@@ -15,11 +15,27 @@ const SCRAMBLE_RADIUS_CSS = 50;
 const HEAP_SPIKE_THRESHOLD = 0.5; // MB change that triggers a glitch
 const HEAP_SPIKE_ENTROPY = 0.03; // fraction of pixels to destabilize on GC
 
-/* ── Halftone size (linear + exposure boost) ──────────────── */
-const EXPOSURE = 1.2;
+/* ── Hero texture rotation ────────────────────────────────── */
+type HeroTexture = {
+  id: string;
+  src: string;
+  invert: boolean;
+  label: string;
+};
+
+// Fallback texture if API fails or directory is empty
+const FALLBACK_TEXTURE: HeroTexture = {
+  id: "fallback",
+  src: "/images/hero/cpu-die-shot.jpeg",
+  invert: true,
+  label: "SYSTEM::FALLBACK_V1",
+};
+
+/* ── Halftone size (schematic sharpening curve) ───────────── */
 function halftoneScale(b: number): number {
   if (b < 0.1) return 0; // noise gate — keep background pitch black
-  return Math.min(1, b * EXPOSURE);
+  const sharp = Math.pow(b, 1.2); // push dark greys to black, pop bright lines
+  return Math.min(0.7, sharp);
 }
 
 /* ── Framer variants ───────────────────────────────────────── */
@@ -58,6 +74,21 @@ export default function HeroSection() {
   ]);
   const [showBoot, setShowBoot] = useState(true);
   const [showDebug, setShowDebug] = useState(false);
+  const [activeTexture, setActiveTexture] = useState<HeroTexture>(FALLBACK_TEXTURE);
+  const [textureReady, setTextureReady] = useState(false);
+
+  // Fetch available textures from API, randomly select one
+  useEffect(() => {
+    fetch("/api/hero-textures")
+      .then((r) => r.json())
+      .then((textures: HeroTexture[]) => {
+        if (textures.length > 0) {
+          setActiveTexture(textures[Math.floor(Math.random() * textures.length)]);
+        }
+        setTextureReady(true);
+      })
+      .catch(() => setTextureReady(true)); // fallback texture on error
+  }, []);
 
   // Telemetry DOM refs (updated imperatively from rAF — zero re-renders)
   const heapRef = useRef<HTMLSpanElement>(null);
@@ -72,23 +103,36 @@ export default function HeroSection() {
   // Parse hardware stats (0 while still probing)
   const detected = stats.cpu !== "CALCULATING_CORES...";
   const cores = detected ? parseInt(stats.cpu) || 4 : 0;
-  const gridSize = cores > 0 ? Math.max(48, Math.min(128, cores * 16)) : 0;
+  const targetGrid = cores > 0
+    ? cores >= 8 ? 320
+    : cores >= 4 ? 192
+    : 192
+    : 0;
+  const [gridSize, setGridSize] = useState(0);
+  const gridTier = gridSize >= 320 ? "UNLEASHED" : gridSize >= 192 ? "STANDARD" : "COMPAT";
+  const downgradedRef = useRef(false);
+
+  // Set initial grid size once cores are detected
+  useEffect(() => {
+    if (targetGrid > 0 && gridSize === 0) setGridSize(targetGrid);
+  }, [targetGrid, gridSize]);
 
   /* ── Boot text sequencer ─────────────────────────────────── */
   useEffect(() => {
     if (!detected) return;
     setBootLines([
+      `LOADING: ${activeTexture.label}`,
       `CORES: ${cores} → RES: ${gridSize}px`,
       `GRID: ${gridSize}×${gridSize}`,
       "BINDING_TELEMETRY...",
     ]);
     const timer = setTimeout(() => setShowBoot(false), 2500);
     return () => clearTimeout(timer);
-  }, [detected, cores, gridSize]);
+  }, [detected, cores, gridSize, activeTexture]);
 
   /* ── Canvas render (starts once gridSize is known) ───────── */
   useEffect(() => {
-    if (gridSize === 0) return;
+    if (gridSize === 0 || !textureReady) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d", { alpha: true });
@@ -103,10 +147,11 @@ export default function HeroSection() {
     let lastTime = 0;
     let prevHeap = 0;
     let smoothDelta = 16.67; // EMA for stable FPS readout
+    let slowFrameStart = 0; // timestamp when slow frames began
 
-    // Load image → grayscale → invert → brightness map
+    // Load image → grayscale → brightness map (invert depends on texture)
     const img = new Image();
-    img.src = "/hero.jpeg";
+    img.src = activeTexture.src;
     img.crossOrigin = "anonymous";
     img.onload = () => {
       const off = document.createElement("canvas");
@@ -134,13 +179,14 @@ export default function HeroSection() {
         const lum =
           (0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2]) / 255;
 
-        // Contrast boost then invert (bright face features → high values)
+        // Contrast boost
         const contrast = 1.8;
         const boosted = Math.min(
           1,
           Math.max(0, (lum - 0.5) * contrast + 0.5),
         );
-        brightness[i] = 1 - boosted;
+        // invert: white-bg sources → dark lines become bright cyan
+        brightness[i] = activeTexture.invert ? 1 - boosted : boosted;
       }
       imgDimRef.current = `${img.naturalWidth}x${img.naturalHeight}`;
     };
@@ -158,6 +204,20 @@ export default function HeroSection() {
       const delta = lastTime ? now - lastTime : 16.67;
       lastTime = now;
       frame++;
+
+      // PERFORMANCE GUARD: auto-downgrade if consistently slow
+      if (!downgradedRef.current) {
+        if (smoothDelta > 20) {
+          if (slowFrameStart === 0) slowFrameStart = now;
+          else if (now - slowFrameStart > 3000) {
+            const lower = gridSize >= 320 ? 192 : 128;
+            downgradedRef.current = true;
+            setGridSize(lower);
+          }
+        } else {
+          slowFrameStart = 0;
+        }
+      }
 
       // BINDING: FPS → Animation Speed
       const noiseTick = delta > 32 ? NOISE_TICK_SLOW : NOISE_TICK_FAST;
@@ -266,7 +326,7 @@ export default function HeroSection() {
       } else {
         // Normal halftone rendering
         ctx.fillStyle = ACCENT;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 0.3;
 
         for (let y = 0; y < gridSize; y++) {
           for (let x = 0; x < gridSize; x++) {
@@ -333,7 +393,7 @@ export default function HeroSection() {
     return () => {
       running = false;
     };
-  }, [gridSize]);
+  }, [gridSize, activeTexture, textureReady]);
 
   /* ── Resize observer ─────────────────────────────────────── */
   useEffect(() => {
@@ -415,11 +475,36 @@ export default function HeroSection() {
             }}
           />
 
-          <motion.p
-            className="mt-4 font-mono text-xs text-text-muted uppercase tracking-widest"
+          {/* ── Spec Sheet ──────────────────────────────────── */}
+          <motion.div
+            className="mt-10 font-mono text-[10px] uppercase tracking-widest leading-loose space-y-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.5 }}
+            transition={{ delay: 1.0, duration: 0.6 }}
+          >
+            <div>
+              <span className="text-zinc-500">{"EDUCATION   "}</span>
+              <span className="text-cyan-500/90">{"QUEEN'S UNIVERSITY // COMPUTER ENGINEERING"}</span>
+            </div>
+            <div>
+              <span className="text-zinc-500">{"CURRENT     "}</span>
+              <span className="text-cyan-500/90">{"DIGITAL DATA ENGINEERING // SANOFI"}</span>
+            </div>
+            <div>
+              <span className="text-zinc-500">{"LOCATION    "}</span>
+              <span className="text-cyan-500/90">{"TORONTO, CANADA"}</span>
+            </div>
+            <div>
+              <span className="text-zinc-500">{"CORE TECH   "}</span>
+              <span className="text-cyan-500/90">{"SNOWFLAKE / DBT / SQL / PYTHON"}</span>
+            </div>
+          </motion.div>
+
+          <motion.p
+            className="mt-6 font-mono text-xs text-text-muted uppercase tracking-widest"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4, duration: 0.5 }}
           >
             <span className="text-accent">&#9662;</span> Scroll to explore
           </motion.p>
@@ -435,6 +520,11 @@ export default function HeroSection() {
               onPointerMove={handlePointerMove}
               onPointerLeave={handlePointerLeave}
             />
+            {/* Active texture label */}
+            <div className="absolute top-3 right-3 z-10 font-mono text-[10px] uppercase tracking-widest text-cyan-500/50">
+              {activeTexture.label}
+            </div>
+
             {/* Scanline overlay */}
             <div
               className="absolute inset-0 pointer-events-none opacity-10"
@@ -475,7 +565,7 @@ export default function HeroSection() {
                   <div className="text-cyan-500/20 mb-2">{"--------------------------------"}</div>
                   <div>{`ALGORITHM   VARIABLE_DENSITY_HALFTONE`}</div>
                   <div>{`SOURCE_RES  ${imgDimRef.current}px`}</div>
-                  <div>{`GRID_RES    ${gridSize}x${gridSize} (CPU_SCALED)`}</div>
+                  <div>{`GRID_RES    ${gridSize}x${gridSize} (${gridTier})`}</div>
                   <div>{`THREADS     ${cores} DETECTED`}</div>
                   <div ref={debugFrameRef}>{"FRAME_TIME  --ms"}</div>
                   <div>{`GPU         ${stats.gpu}`}</div>
@@ -486,7 +576,7 @@ export default function HeroSection() {
 
           {/* ── Telemetry Deck (3 coupled values) ─────────────── */}
           <div className="w-full max-w-120 mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-cyan-500/60">
-            <span>{`RES: ${gridSize}px :: ${cores}_CORE`}</span>
+            <span>{`RES: ${gridSize}px :: ${gridTier}_MODE`}</span>
             <span ref={cycleRef}>{"CYCLE: --Hz"}</span>
             <span ref={heapRef}>{"HEAP: --.--MB"}</span>
             <button
