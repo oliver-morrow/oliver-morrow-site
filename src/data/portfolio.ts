@@ -172,8 +172,13 @@ export const skills: SkillCategory[] = [
     skills: [
       { name: "Python", level: "kernel", usedAt: ["Sanofi", "Tilray", "Cyclicus"] },
       { name: "C++", level: "kernel", usedAt: ["Noteworthy"] },
+      { name: "TypeScript", level: "kernel", usedAt: [] },
+      { name: "Java", level: "driver", usedAt: [] },
+      { name: "C", level: "driver", usedAt: [] },
+      { name: "VHDL", level: "driver", usedAt: [] },
       { name: "SQL", level: "kernel", usedAt: ["Sanofi", "Tilray"] },
       { name: "Bash", level: "driver", usedAt: ["Sanofi", "Legal Aid Ontario"] },
+      { name: "Nios II", level: "driver", usedAt: [] },
     ],
   },
   {
