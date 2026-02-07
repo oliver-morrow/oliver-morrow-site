@@ -14,9 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Oliver Morrow — Engineer",
+  title: {
+    template: "%s :: OLIVER MORROW",
+    default: "OLIVER MORROW :: COMPUTER_ENG",
+  },
   description:
-    "Computer Engineering & Data Engineering portfolio. Hardware, pipelines, infrastructure.",
+    "Computer Engineering // Data Architecture // Hardware-Accelerated Interfaces.",
+  keywords: ["Data Engineer", "Systems Engineering", "Toronto", "Next.js", "WebGL"],
 };
 
 export default function RootLayout({
