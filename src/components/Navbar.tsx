@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Terminal, Github, Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail } from "lucide-react";
 import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
@@ -65,13 +65,9 @@ export default function Navbar() {
           {/* Left — system identifier */}
           <a
             href="#"
-            className="flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors"
+            className="font-mono text-sm font-semibold text-text-primary hover:text-accent transition-colors"
           >
-            <Terminal className="h-4 w-4 text-accent" />
-            <span className="hidden sm:inline text-text-muted">~/</span>
-            <span className="font-semibold text-text-primary">
-              {siteConfig.profile.name.toLowerCase().replace(" ", "-")}
-            </span>
+            olivermorrow
           </a>
 
           {/* Center — nav links */}
