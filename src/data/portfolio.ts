@@ -6,7 +6,7 @@ export const siteConfig: SiteConfig = {
     title: "Computer & Data Engineering",
     bio: "Bridging hardware constraints with data scale. Specializing in Embedded Systems, Snowflake Architecture, and High-Performance ELT Pipelines.",
     socials: {
-      github: "https://github.com/olivermorrow",
+      github: "https://github.com/oliver-morrow",
       linkedin: "https://linkedin.com/in/oliver-morrow",
       email: "oliver@olivermrw.site",
     },
