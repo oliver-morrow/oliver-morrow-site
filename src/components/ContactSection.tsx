@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import SectionReveal from "./SectionReveal";
 
 const { socials } = siteConfig.profile;
+const commitHash = process.env.NEXT_PUBLIC_COMMIT_SHA?.substring(0, 7) || "DEV";
 
 const socialLinks = [
   { icon: Github, href: socials.github, label: "GitHub" },
@@ -58,7 +59,7 @@ export default function ContactSection() {
                   "w-full bg-card border border-border rounded-lg px-3 py-2.5",
                   "font-mono text-sm text-text-primary placeholder:text-text-muted/40",
                   "outline-none transition-colors duration-150",
-                  "focus:border-accent"
+                  "focus:border-accent caret-cyan-500",
                 )}
               />
             </div>
@@ -80,7 +81,7 @@ export default function ContactSection() {
                   "w-full bg-card border border-border rounded-lg px-3 py-2.5 resize-none",
                   "font-mono text-sm text-text-primary placeholder:text-text-muted/40",
                   "outline-none transition-colors duration-150",
-                  "focus:border-accent"
+                  "focus:border-accent caret-cyan-500",
                 )}
               />
             </div>
@@ -102,12 +103,25 @@ export default function ContactSection() {
       </SectionReveal>
 
       <footer className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 flex items-center justify-between">
-          <p className="font-mono text-xs text-text-muted">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+          {/* Left — Copyright */}
+          <p>
+            <span className="opacity-50">{"_>"}</span>{" "}
             &copy; {new Date().getFullYear()} {siteConfig.profile.name}
           </p>
 
-          <div className="flex items-center gap-3">
+          {/* Center — System Dashboard */}
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-dot" />
+            <span>{"SYSTEM: NORMAL"}</span>
+            <span className="opacity-30">{"::"}</span>
+            <span>{"REGION: NA-EAST"}</span>
+            <span className="opacity-30">{"::"}</span>
+            <span>{`BUILD: ${commitHash}`}</span>
+          </div>
+
+          {/* Right — Socials */}
+          <div className="flex items-center gap-2">
             {socialLinks.map((social) => (
               <a
                 key={social.label}
@@ -115,9 +129,9 @@ export default function ContactSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className="text-text-muted hover:text-accent transition-colors duration-150"
+                className="text-zinc-600 hover:text-accent transition-colors duration-150"
               >
-                <social.icon className="h-4 w-4" />
+                <social.icon className="h-3.5 w-3.5" />
               </a>
             ))}
           </div>

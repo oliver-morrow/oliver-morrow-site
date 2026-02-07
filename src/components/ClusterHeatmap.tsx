@@ -10,7 +10,7 @@ const DECREMENT = 3;
 
 function workloadColor(value: number): string {
   if (value > 300) return "#f43f5e"; // rose-500
-  if (value >= 100) return "#f59e0b"; // amber-500
+  if (value >= 100) return "#06b6d4"; // cyan-500
   if (value > 0) return "#06b6d4";   // cyan-500
   return "#18181b";                   // zinc-900 (idle)
 }

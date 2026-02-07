@@ -11,10 +11,10 @@
   --color-card: #09090b;        /* zinc-950 */
   --color-card-hover: #18181b;  /* zinc-800 */
 
-  /* Accent — Safety Amber */
-  --color-accent: #f59e0b;
-  --color-accent-dim: rgba(245, 158, 11, 0.5);
-  --color-accent-glow: rgba(245, 158, 11, 0.15);
+  /* Accent — Cyan */
+  --color-accent: #06b6d4;
+  --color-accent-dim: rgba(6, 182, 212, 0.5);
+  --color-accent-glow: rgba(6, 182, 212, 0.15);
 
   /* Text */
   --color-text-primary: #ffffff;
@@ -23,7 +23,7 @@
 
   /* Borders */
   --color-border: #27272a;      /* zinc-800 */
-  --color-border-hover: rgba(245, 158, 11, 0.5);
+  --color-border-hover: rgba(6, 182, 212, 0.5);
 }
 
 /* ── Base resets ─────────────────────────────────────────────── */

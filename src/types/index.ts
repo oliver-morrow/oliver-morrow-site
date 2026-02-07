@@ -17,6 +17,7 @@ export interface Experience {
   company: string;
   period: { start: string; end: string };
   description: string;
+  detailedDescription?: string[];
   technologies: string[];
   type: "work" | "volunteer";
 }
@@ -26,6 +27,7 @@ export interface Project {
   title: string;
   tagline: string;
   description: string;
+  detailedDescription?: string[];
   technologies: string[];
   links: {
     demo?: string;

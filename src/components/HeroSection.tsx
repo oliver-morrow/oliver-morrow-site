@@ -6,12 +6,15 @@ import { siteConfig } from "@/data/portfolio";
 import { useSystemStats } from "@/hooks/useSystemStats";
 
 /* ── Constants ─────────────────────────────────────────────── */
-const AMBER = "#f59e0b";
+const ACCENT = "#06b6d4";
 const GAP_CSS = 0.5;
 const STABILITY_RATE = 0.02;
 const STABILITY_THRESHOLD = 0.8;
-const NOISE_TICK = 10;
+const NOISE_TICK_FAST = 6; // normal: re-roll noise every 6 frames
+const NOISE_TICK_SLOW = 10; // throttled: when delta > 32ms (below 30fps)
 const SCRAMBLE_RADIUS_CSS = 50;
+const HEAP_SPIKE_THRESHOLD = 0.5; // MB change that triggers a glitch
+const HEAP_SPIKE_ENTROPY = 0.03; // fraction of pixels to destabilize on GC
 
 /* ── Floyd-Steinberg dithering ─────────────────────────────── */
 function floydSteinberg(
@@ -79,31 +82,24 @@ export default function HeroSection() {
 
   // Telemetry DOM refs (updated imperatively from rAF — zero re-renders)
   const heapRef = useRef<HTMLSpanElement>(null);
-  const renderRef = useRef<HTMLSpanElement>(null);
+  const cycleRef = useRef<HTMLSpanElement>(null);
 
   // Parse hardware stats (0 while still probing)
   const detected = stats.cpu !== "CALCULATING_CORES...";
   const cores = detected ? parseInt(stats.cpu) || 4 : 0;
-  const ramGB = detected ? parseInt(stats.ram) || 4 : 4;
-  const gridSize = cores > 0 ? Math.max(80, Math.min(160, cores * 20)) : 0;
-
-  // RAM → noise config (low RAM = more "memory corruption")
-  const noiseInterval = ramGB >= 16 ? 300 : ramGB >= 8 ? 180 : 90;
-  const noiseAmount = ramGB >= 16 ? 0.002 : ramGB >= 8 ? 0.005 : 0.012;
-  const noiseRef = useRef({ noiseInterval, noiseAmount });
-  noiseRef.current = { noiseInterval, noiseAmount };
+  const gridSize = cores > 0 ? Math.max(48, Math.min(128, cores * 16)) : 0;
 
   /* ── Boot text sequencer ─────────────────────────────────── */
   useEffect(() => {
     if (!detected) return;
     setBootLines([
-      `CPU: ${cores}-CORE`,
-      `RAM: ${ramGB} GB`,
-      `ALLOCATING_GRID: ${gridSize}×${gridSize}`,
+      `CORES: ${cores} → RES: ${gridSize}px`,
+      `GRID: ${gridSize}×${gridSize}`,
+      "BINDING_TELEMETRY...",
     ]);
     const timer = setTimeout(() => setShowBoot(false), 2500);
     return () => clearTimeout(timer);
-  }, [detected, cores, ramGB, gridSize]);
+  }, [detected, cores, gridSize]);
 
   /* ── Canvas render (starts once gridSize is known) ───────── */
   useEffect(() => {
@@ -120,6 +116,7 @@ export default function HeroSection() {
     let dithered: Uint8Array | null = null;
     let frame = 0;
     let lastTime = 0;
+    let prevHeap = 0;
 
     // Load image → grayscale → invert → Floyd-Steinberg
     const img = new Image();
@@ -177,19 +174,23 @@ export default function HeroSection() {
       lastTime = now;
       frame++;
 
-      const { noiseInterval: nI, noiseAmount: nA } = noiseRef.current;
-
-      // RAM-based "memory corruption" bursts
-      if (frame % nI === 0) {
-        for (let i = 0; i < total; i++) {
-          if (Math.random() < nA) stability[i] = 0;
-        }
-      }
-
-      // Re-roll noise at ~6 fps
-      if (frame % NOISE_TICK === 0) {
+      // BINDING: FPS → Animation Speed
+      const noiseTick = delta > 32 ? NOISE_TICK_SLOW : NOISE_TICK_FAST;
+      if (frame % noiseTick === 0) {
         for (let i = 0; i < total; i++)
           noise[i] = Math.random() > 0.5 ? 1 : 0;
+      }
+
+      // BINDING: Memory → Entropy (heap spikes destabilize pixels)
+      const mem = getHeapMemory();
+      if (mem) {
+        const heapMB = mem.usedJSHeapSize / 1048576;
+        if (prevHeap > 0 && Math.abs(heapMB - prevHeap) > HEAP_SPIKE_THRESHOLD) {
+          for (let i = 0; i < total; i++) {
+            if (Math.random() < HEAP_SPIKE_ENTROPY) stability[i] = 0;
+          }
+        }
+        prevHeap = heapMB;
       }
 
       const w = canvas.width;
@@ -205,7 +206,7 @@ export default function HeroSection() {
       const mouse = mouseRef.current;
 
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = AMBER;
+      ctx.fillStyle = ACCENT;
 
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
@@ -238,21 +239,19 @@ export default function HeroSection() {
       }
 
       // ── Telemetry update (imperative DOM writes) ──────────
-      if (renderRef.current) {
+      // CYCLE: real fps from frame delta
+      if (cycleRef.current) {
         const fps = Math.round(1000 / delta);
-        renderRef.current.textContent = `RENDER: ${delta.toFixed(1)}ms (${fps}fps)`;
+        cycleRef.current.textContent = `CYCLE: ${fps}Hz`;
       }
 
+      // HEAP: real or estimated
       if (heapRef.current) {
-        const mem = getHeapMemory();
         if (mem) {
-          const used = (mem.usedJSHeapSize / 1048576).toFixed(1);
-          const limit = (mem.jsHeapSizeLimit / 1048576).toFixed(0);
-          heapRef.current.textContent = `HEAP: ${used} / ${limit} MB`;
+          heapRef.current.textContent = `HEAP: ${(mem.usedJSHeapSize / 1048576).toFixed(1)}MB`;
         } else {
-          // Simulated fluctuation for Firefox/Safari
           const sim = 12 + Math.sin(now * 0.002) * 3 + Math.sin(now * 0.007) * 1.5;
-          heapRef.current.textContent = `HEAP: ~${sim.toFixed(1)} MB`;
+          heapRef.current.textContent = `HEAP: ~${sim.toFixed(1)}MB`;
         }
       }
 
@@ -301,13 +300,6 @@ export default function HeroSection() {
   const handlePointerLeave = useCallback(() => {
     mouseRef.current = null;
   }, []);
-
-  // Truncate GPU string for display
-  const gpuShort = stats.gpu
-    .replace(/ANGLE \(|,.*|\)/g, "")
-    .replace(/\s+/g, "_")
-    .toUpperCase()
-    .slice(0, 28);
 
   /* ── JSX ─────────────────────────────────────────────────── */
   return (
@@ -391,12 +383,11 @@ export default function HeroSection() {
             </AnimatePresence>
           </div>
 
-          {/* ── Hardware Telemetry Deck ──────────────────────── */}
-          <div className="w-full max-w-120 mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-amber-500/60">
-            <span ref={heapRef}>{"HEAP: --.- MB"}</span>
-            <span ref={renderRef}>{"RENDER: --.--ms"}</span>
-            <span>{"GPU: " + gpuShort}</span>
-            <span>{`THREADS: ${cores || "—"}`}</span>
+          {/* ── Telemetry Deck (3 coupled values) ─────────────── */}
+          <div className="w-full max-w-120 mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-cyan-500/60">
+            <span>{`RES: ${gridSize}px :: ${cores}_CORE`}</span>
+            <span ref={cycleRef}>{"CYCLE: --Hz"}</span>
+            <span ref={heapRef}>{"HEAP: --.--MB"}</span>
           </div>
         </div>
       </div>

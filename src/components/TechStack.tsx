@@ -68,7 +68,7 @@ export default function TechStack() {
                 {category.skills.map((skill) => (
                   <span
                     key={skill.name}
-                    className="text-zinc-300 text-sm font-mono px-3 py-1 rounded-full border border-zinc-800 hover:border-amber-500 hover:text-amber-500 cursor-help transition-all duration-200"
+                    className="text-zinc-300 text-sm font-mono px-3 py-1 rounded-full border border-zinc-800 hover:border-cyan-500 hover:text-cyan-500 cursor-help transition-all duration-200"
                     onMouseEnter={(e) => handleMouseEnter(e, skill)}
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
@@ -84,10 +84,10 @@ export default function TechStack() {
         {/* Inspection tooltip */}
         {tooltip && (
           <div
-            className="pointer-events-none absolute z-50 bg-black border border-amber-500/50 rounded px-3 py-2 shadow-2xl shadow-amber-900/20"
+            className="pointer-events-none absolute z-50 bg-black border border-cyan-500/50 rounded px-3 py-2 shadow-2xl shadow-cyan-900/20"
             style={{ left: tooltip.x, top: tooltip.y }}
           >
-            <p className="text-[10px] font-mono text-amber-500">
+            <p className="text-[10px] font-mono text-cyan-500">
               {levelLabel[tooltip.skill.level]} {levelBar[tooltip.skill.level]}
             </p>
             {tooltip.skill.usedAt.length > 0 && (
