@@ -32,6 +32,25 @@
   scrollbar-color: var(--color-border) transparent;
 }
 
+/* ── Custom scrollbar (WebKit) ───────────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border: 2px solid #0a0a0a;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
 ::selection {
   background: var(--color-accent);
   color: #000000;

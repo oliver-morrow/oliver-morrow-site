@@ -7,7 +7,6 @@ import { useSystemStats } from "@/hooks/useSystemStats";
 
 /* ── Constants ─────────────────────────────────────────────── */
 const ACCENT = "#06b6d4";
-const GAP_CSS = 0.5;
 const STABILITY_RATE = 0.02;
 const STABILITY_THRESHOLD = 0.8;
 const NOISE_TICK_FAST = 6; // normal: re-roll noise every 6 frames
@@ -16,32 +15,11 @@ const SCRAMBLE_RADIUS_CSS = 50;
 const HEAP_SPIKE_THRESHOLD = 0.5; // MB change that triggers a glitch
 const HEAP_SPIKE_ENTROPY = 0.03; // fraction of pixels to destabilize on GC
 
-/* ── Floyd-Steinberg dithering ─────────────────────────────── */
-function floydSteinberg(
-  gray: Float32Array,
-  w: number,
-  h: number,
-): Uint8Array {
-  const buf = Float32Array.from(gray);
-  const out = new Uint8Array(w * h);
-
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const i = y * w + x;
-      const old = buf[i];
-      const val = old > 0.5 ? 1 : 0;
-      out[i] = val;
-      const err = old - val;
-
-      if (x + 1 < w) buf[i + 1] += err * (7 / 16);
-      if (y + 1 < h) {
-        if (x > 0) buf[(y + 1) * w + x - 1] += err * (3 / 16);
-        buf[(y + 1) * w + x] += err * (5 / 16);
-        if (x + 1 < w) buf[(y + 1) * w + x + 1] += err * (1 / 16);
-      }
-    }
-  }
-  return out;
+/* ── Halftone size (linear + exposure boost) ──────────────── */
+const EXPOSURE = 1.2;
+function halftoneScale(b: number): number {
+  if (b < 0.1) return 0; // noise gate — keep background pitch black
+  return Math.min(1, b * EXPOSURE);
 }
 
 /* ── Framer variants ───────────────────────────────────────── */
@@ -79,10 +57,17 @@ export default function HeroSection() {
     "DETECTING_CORES...",
   ]);
   const [showBoot, setShowBoot] = useState(true);
+  const [showDebug, setShowDebug] = useState(false);
 
   // Telemetry DOM refs (updated imperatively from rAF — zero re-renders)
   const heapRef = useRef<HTMLSpanElement>(null);
   const cycleRef = useRef<HTMLSpanElement>(null);
+  const debugFrameRef = useRef<HTMLDivElement>(null);
+  const imgDimRef = useRef("--x--");
+  const debugRef = useRef(false);
+
+  // Keep ref in sync so the rAF closure can read debug state
+  useEffect(() => { debugRef.current = showDebug; }, [showDebug]);
 
   // Parse hardware stats (0 while still probing)
   const detected = stats.cpu !== "CALCULATING_CORES...";
@@ -111,14 +96,15 @@ export default function HeroSection() {
 
     const total = gridSize * gridSize;
     const stability = new Float32Array(total);
-    const noise = new Uint8Array(total);
-    for (let i = 0; i < total; i++) noise[i] = Math.random() > 0.5 ? 1 : 0;
-    let dithered: Uint8Array | null = null;
+    const noise = new Float32Array(total);
+    for (let i = 0; i < total; i++) noise[i] = Math.random();
+    let brightness: Float32Array | null = null;
     let frame = 0;
     let lastTime = 0;
     let prevHeap = 0;
+    let smoothDelta = 16.67; // EMA for stable FPS readout
 
-    // Load image → grayscale → invert → Floyd-Steinberg
+    // Load image → grayscale → invert → brightness map
     const img = new Image();
     img.src = "/hero.jpeg";
     img.crossOrigin = "anonymous";
@@ -142,29 +128,28 @@ export default function HeroSection() {
       offCtx.drawImage(img, sx, sy, sSize, sSize, 0, 0, gridSize, gridSize);
       const { data } = offCtx.getImageData(0, 0, gridSize, gridSize);
 
-      const gray = new Float32Array(total);
+      brightness = new Float32Array(total);
       for (let i = 0; i < total; i++) {
         const p = i * 4;
         const lum =
           (0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2]) / 255;
 
-        // Contrast boost: steepen mid-tones before inverting
+        // Contrast boost then invert (bright face features → high values)
         const contrast = 1.8;
         const boosted = Math.min(
           1,
           Math.max(0, (lum - 0.5) * contrast + 0.5),
         );
-        gray[i] = 1 - boosted;
+        brightness[i] = 1 - boosted;
       }
-
-      dithered = floydSteinberg(gray, gridSize, gridSize);
+      imgDimRef.current = `${img.naturalWidth}x${img.naturalHeight}`;
     };
 
     // ── rAF render loop ─────────────────────────────────────
     let running = true;
     const render = (now: number) => {
       if (!running) return;
-      if (!dithered) {
+      if (!brightness) {
         requestAnimationFrame(render);
         return;
       }
@@ -177,8 +162,7 @@ export default function HeroSection() {
       // BINDING: FPS → Animation Speed
       const noiseTick = delta > 32 ? NOISE_TICK_SLOW : NOISE_TICK_FAST;
       if (frame % noiseTick === 0) {
-        for (let i = 0; i < total; i++)
-          noise[i] = Math.random() > 0.5 ? 1 : 0;
+        for (let i = 0; i < total; i++) noise[i] = Math.random();
       }
 
       // BINDING: Memory → Entropy (heap spikes destabilize pixels)
@@ -198,50 +182,132 @@ export default function HeroSection() {
       const dpr = window.devicePixelRatio || 1;
       const cellW = w / gridSize;
       const cellH = h / gridSize;
-      const gap = GAP_CSS * dpr;
-      const dotW = cellW - gap;
-      const dotH = cellH - gap;
       const scrambleR = SCRAMBLE_RADIUS_CSS * dpr;
       const scrambleR2 = scrambleR * scrambleR;
       const mouse = mouseRef.current;
 
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = ACCENT;
 
-      for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
-          const idx = y * gridSize + x;
+      const wireframe = debugRef.current;
 
-          // Mouse scramble
-          if (mouse) {
-            const dx = (x + 0.5) * cellW - mouse.x;
-            const dy = (y + 0.5) * cellH - mouse.y;
-            if (dx * dx + dy * dy < scrambleR2) {
-              stability[idx] = 0;
+      // Schematic mode: draw cell grid + brightness symbols
+      if (wireframe) {
+        // 1. Graph paper — stroke every cell boundary
+        ctx.strokeStyle = "rgba(6,182,212,0.1)";
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i <= gridSize; i++) {
+          const px = i * cellW;
+          const py = i * cellH;
+          ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, h); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(w, py); ctx.stroke();
+        }
+
+        // 2. Symbol pass — stroke-only, uniform weight
+        ctx.strokeStyle = ACCENT;
+        ctx.lineWidth = 0.5;
+
+        for (let y = 0; y < gridSize; y++) {
+          for (let x = 0; x < gridSize; x++) {
+            const idx = y * gridSize + x;
+
+            // Mouse scramble
+            if (mouse) {
+              const dx = (x + 0.5) * cellW - mouse.x;
+              const dy = (y + 0.5) * cellH - mouse.y;
+              if (dx * dx + dy * dy < scrambleR2) {
+                stability[idx] = 0;
+              }
             }
+
+            // Advance stability
+            if (stability[idx] < 1) {
+              stability[idx] = Math.min(stability[idx] + STABILITY_RATE, 1);
+            }
+
+            const b =
+              stability[idx] >= STABILITY_THRESHOLD
+                ? brightness[idx]
+                : noise[idx];
+
+            const centerX = x * cellW + cellW / 2;
+            const centerY = y * cellH + cellH / 2;
+
+            if (b > 0.7) {
+              // Boxed X — box + diagonals
+              const sz = cellW * 0.8;
+              const x0 = centerX - sz / 2;
+              const y0 = centerY - sz / 2;
+              ctx.strokeRect(x0, y0, sz, sz);
+              ctx.beginPath();
+              ctx.moveTo(x0, y0); ctx.lineTo(x0 + sz, y0 + sz);
+              ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(x0 + sz, y0); ctx.lineTo(x0, y0 + sz);
+              ctx.stroke();
+            } else if (b > 0.15) {
+              // Plus — crosshair
+              const arm = cellW * 0.35;
+              ctx.beginPath();
+              ctx.moveTo(centerX - arm, centerY);
+              ctx.lineTo(centerX + arm, centerY);
+              ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(centerX, centerY - arm);
+              ctx.lineTo(centerX, centerY + arm);
+              ctx.stroke();
+            } else if (b > 0.05) {
+              // Dot — single pixel
+              ctx.fillStyle = ACCENT;
+              ctx.fillRect(centerX - 0.5, centerY - 0.5, 1, 1);
+            }
+            // else: empty cell
           }
+        }
+      } else {
+        // Normal halftone rendering
+        ctx.fillStyle = ACCENT;
+        ctx.lineWidth = 1;
 
-          // Advance stability
-          if (stability[idx] < 1) {
-            stability[idx] = Math.min(stability[idx] + STABILITY_RATE, 1);
-          }
+        for (let y = 0; y < gridSize; y++) {
+          for (let x = 0; x < gridSize; x++) {
+            const idx = y * gridSize + x;
 
-          // Stable → dithered, unstable → noise
-          const on =
-            stability[idx] >= STABILITY_THRESHOLD
-              ? dithered[idx] === 1
-              : noise[idx] === 1;
+            // Mouse scramble
+            if (mouse) {
+              const dx = (x + 0.5) * cellW - mouse.x;
+              const dy = (y + 0.5) * cellH - mouse.y;
+              if (dx * dx + dy * dy < scrambleR2) {
+                stability[idx] = 0;
+              }
+            }
 
-          if (on) {
-            ctx.fillRect(x * cellW, y * cellH, dotW, dotH);
+            // Advance stability
+            if (stability[idx] < 1) {
+              stability[idx] = Math.min(stability[idx] + STABILITY_RATE, 1);
+            }
+
+            const b =
+              stability[idx] >= STABILITY_THRESHOLD
+                ? brightness[idx]
+                : noise[idx];
+
+            const scale = halftoneScale(b);
+            if (scale === 0) continue;
+
+            const baseW = cellW * scale;
+            const baseH = cellH * scale;
+            const cx = x * cellW + (cellW - baseW) / 2;
+            const cy = y * cellH + (cellH - baseH) / 2;
+            ctx.fillRect(cx, cy, baseW, baseH);
           }
         }
       }
 
       // ── Telemetry update (imperative DOM writes) ──────────
-      // CYCLE: real fps from frame delta
+      // CYCLE: smoothed fps (EMA to avoid flicker)
+      smoothDelta += (delta - smoothDelta) * 0.1;
       if (cycleRef.current) {
-        const fps = Math.round(1000 / delta);
+        const fps = Math.round(1000 / smoothDelta);
         cycleRef.current.textContent = `CYCLE: ${fps}Hz`;
       }
 
@@ -253,6 +319,11 @@ export default function HeroSection() {
           const sim = 12 + Math.sin(now * 0.002) * 3 + Math.sin(now * 0.007) * 1.5;
           heapRef.current.textContent = `HEAP: ~${sim.toFixed(1)}MB`;
         }
+      }
+
+      // DEBUG: live frame time
+      if (debugFrameRef.current) {
+        debugFrameRef.current.textContent = `FRAME_TIME  ${delta.toFixed(2)}ms`;
       }
 
       requestAnimationFrame(render);
@@ -360,9 +431,17 @@ export default function HeroSection() {
           <div className="relative w-full max-w-120">
             <canvas
               ref={canvasRef}
-              className="w-full aspect-square"
+              className="w-full aspect-square drop-shadow-[0_0_10px_rgba(6,182,212,0.5)] cursor-crosshair"
               onPointerMove={handlePointerMove}
               onPointerLeave={handlePointerLeave}
+            />
+            {/* Scanline overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-10"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.4) 1px, rgba(0,0,0,0.4) 2px)",
+              }}
             />
 
             {/* Boot overlay */}
@@ -381,13 +460,42 @@ export default function HeroSection() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Debug terminal panel */}
+            <AnimatePresence>
+              {showDebug && (
+                <motion.div
+                  className="absolute top-3 left-3 z-10 bg-zinc-950/90 border border-cyan-500/20 backdrop-blur-sm rounded-md p-4 font-mono text-[10px] text-cyan-400 uppercase tracking-widest leading-relaxed"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="text-cyan-500/40 mb-1">{"RENDERER::SCHEMATIC_VIEW"}</div>
+                  <div className="text-cyan-500/20 mb-2">{"--------------------------------"}</div>
+                  <div>{`ALGORITHM   VARIABLE_DENSITY_HALFTONE`}</div>
+                  <div>{`SOURCE_RES  ${imgDimRef.current}px`}</div>
+                  <div>{`GRID_RES    ${gridSize}x${gridSize} (CPU_SCALED)`}</div>
+                  <div>{`THREADS     ${cores} DETECTED`}</div>
+                  <div ref={debugFrameRef}>{"FRAME_TIME  --ms"}</div>
+                  <div>{`GPU         ${stats.gpu}`}</div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* ── Telemetry Deck (3 coupled values) ─────────────── */}
-          <div className="w-full max-w-120 mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-cyan-500/60">
+          <div className="w-full max-w-120 mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-cyan-500/60">
             <span>{`RES: ${gridSize}px :: ${cores}_CORE`}</span>
             <span ref={cycleRef}>{"CYCLE: --Hz"}</span>
             <span ref={heapRef}>{"HEAP: --.--MB"}</span>
+            <button
+              type="button"
+              onClick={() => setShowDebug((d) => !d)}
+              className="text-cyan-500/50 hover:text-cyan-500 transition-colors cursor-pointer"
+            >
+              {showDebug ? "[ HIDE_RENDER_STATS ]" : "[ VIEW_RENDER_STATS ]"}
+            </button>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Github, Linkedin, Mail } from "lucide-react";
 import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,19 @@ const socialLinks = [
 
 export default function ContactSection() {
   const [sent, setSent] = useState(false);
+  const [latency, setLatency] = useState<number | null>(null);
+  const [location, setLocation] = useState<string | null>(null);
+
+  useEffect(() => {
+    const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (nav) {
+      setLatency(Math.round(nav.domComplete - nav.requestStart));
+    }
+
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const city = tz.split("/").pop()?.replace(/_/g, " ").toUpperCase() ?? tz.toUpperCase();
+    setLocation(city);
+  }, []);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -110,14 +123,13 @@ export default function ContactSection() {
             &copy; {new Date().getFullYear()} {siteConfig.profile.name}
           </p>
 
-          {/* Center — System Dashboard */}
+          {/* Center — Telemetry */}
           <div className="hidden sm:flex items-center gap-2">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-dot" />
-            <span>{"SYSTEM: NORMAL"}</span>
+            <span>{`LATENCY: ${latency ?? "--"}ms`}</span>
             <span className="opacity-30">{"::"}</span>
-            <span>{"REGION: NA-EAST"}</span>
+            <span>{`LOC: ${location ?? "--"}`}</span>
             <span className="opacity-30">{"::"}</span>
-            <span>{`BUILD: ${commitHash}`}</span>
+            <span>{`BUILD: git-${commitHash}`}</span>
           </div>
 
           {/* Right — Socials */}

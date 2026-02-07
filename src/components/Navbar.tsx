@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Terminal, Activity, Github, Linkedin, Mail } from "lucide-react";
+import { Terminal, Github, Linkedin, Mail } from "lucide-react";
 import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
@@ -20,13 +20,34 @@ const socialLinks = [
   { icon: Mail, href: `mailto:${socials.email}`, label: "Email" },
 ];
 
+const BUILD_TIME = Number(process.env.NEXT_PUBLIC_BUILD_TIME) || Date.now();
+
+function formatUptime(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m ${sec}s`;
+  return `${m}m ${sec}s`;
+}
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [uptime, setUptime] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const tick = () => setUptime(formatUptime(Date.now() - BUILD_TIME));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
@@ -70,13 +91,14 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Right — status + socials */}
+          {/* Right — uptime + socials */}
           <div className="flex items-center gap-3">
-            {/* Uptime indicator */}
-            <div className="hidden sm:flex items-center gap-1.5 font-mono text-xs text-text-muted">
-              <Activity className="h-3 w-3 text-accent animate-pulse-dot" />
-              <span className="text-accent">Available</span>
-            </div>
+            {uptime && (
+              <div className="hidden sm:flex items-center gap-1.5 font-mono text-xs text-text-muted">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-dot" />
+                <span>{uptime}</span>
+              </div>
+            )}
 
             <div className="h-4 w-px bg-border hidden sm:block" />
 
