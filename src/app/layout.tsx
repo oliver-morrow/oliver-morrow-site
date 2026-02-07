@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     template: "%s :: OLIVER MORROW",
-    default: "OLIVER MORROW :: COMPUTER_ENG",
+    default: "OLIVER MORROW",
   },
   description:
     "Computer Engineering // Data Architecture // Hardware-Accelerated Interfaces.",
