@@ -116,7 +116,7 @@ export default function ContactSection() {
                   type="text"
                   required
                   disabled={isSubmitting}
-                  placeholder="What is this regarding?"
+                  placeholder="Subject line"
                   className={inputClasses}
                 />
               </div>
