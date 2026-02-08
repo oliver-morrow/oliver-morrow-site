@@ -532,7 +532,7 @@ export default function HeroSection() {
   /* ── JSX ─────────────────────────────────────────────────── */
   return (
     <section className="relative mx-auto max-w-6xl px-4 sm:px-6">
-      <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 py-20 sm:py-28 lg:py-36">
+      <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 pt-20 sm:pt-24 lg:pt-24 pb-20 sm:pb-28 lg:pb-36">
         {/* ── Left: Name + Title ─────────────────────────────── */}
         <motion.div
           className="flex-1 min-w-0"
