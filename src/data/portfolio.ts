@@ -8,7 +8,7 @@ export const siteConfig: SiteConfig = {
     socials: {
       github: "https://github.com/oliver-morrow",
       linkedin: "https://linkedin.com/in/oliver-morrow",
-      email: "oliver@olivermrw.site",
+      email: "me@olivermorrow.ca",
     },
   },
 };
