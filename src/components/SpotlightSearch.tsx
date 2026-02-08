@@ -56,6 +56,7 @@ export default function SpotlightSearch() {
   const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const mouseMovedRef = useRef(false);
 
   useBodyScrollLock(open);
 
@@ -66,7 +67,11 @@ export default function SpotlightSearch() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
+        // Reset state synchronously with open toggle so React batches them
+        // into a single render — avoids stale selectedIndex after paint
         setOpen((prev) => !prev);
+        setSelectedIndex(0);
+        setQuery("");
       }
     };
     document.addEventListener("keydown", handleKeyDown);
@@ -75,16 +80,19 @@ export default function SpotlightSearch() {
 
   // Custom event listener for navbar button
   useEffect(() => {
-    const handleOpen = () => setOpen(true);
+    const handleOpen = () => {
+      setOpen(true);
+      setSelectedIndex(0);
+      setQuery("");
+    };
     document.addEventListener("spotlight:open", handleOpen);
     return () => document.removeEventListener("spotlight:open", handleOpen);
   }, []);
 
-  // Auto-focus input when opened, reset state
+  // Focus input when opened
   useEffect(() => {
     if (open) {
-      setQuery("");
-      setSelectedIndex(0);
+      mouseMovedRef.current = false;
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);
@@ -113,12 +121,19 @@ export default function SpotlightSearch() {
     setSelectedIndex(0);
   }, [results]);
 
-  // Scroll active item into view
+  // Scroll active item into view (only within the list, never the page)
   useEffect(() => {
-    const el = listRef.current?.querySelector(
-      `[data-index="${selectedIndex}"]`,
-    );
-    el?.scrollIntoView({ block: "nearest" });
+    const list = listRef.current;
+    const el = list?.querySelector(`[data-index="${selectedIndex}"]`) as HTMLElement | null;
+    if (list && el) {
+      const elRect = el.getBoundingClientRect();
+      const listRect = list.getBoundingClientRect();
+      if (elRect.top < listRect.top) {
+        list.scrollTop -= listRect.top - elRect.top;
+      } else if (elRect.bottom > listRect.bottom) {
+        list.scrollTop += elRect.bottom - listRect.bottom;
+      }
+    }
   }, [selectedIndex]);
 
   const handleSelect = useCallback(
@@ -216,6 +231,7 @@ export default function SpotlightSearch() {
               <div
                 ref={listRef}
                 className="max-h-[40vh] overflow-y-auto py-2"
+                onMouseMove={() => { mouseMovedRef.current = true; }}
               >
                 {results.length === 0 && query.trim() && (
                   <p className="px-4 py-8 text-center font-mono text-xs text-text-muted">
@@ -241,7 +257,7 @@ export default function SpotlightSearch() {
                             key={item.id}
                             data-index={globalIdx}
                             onClick={() => handleSelect(item)}
-                            onMouseEnter={() => setSelectedIndex(globalIdx)}
+                            onMouseEnter={() => { if (mouseMovedRef.current) setSelectedIndex(globalIdx); }}
                             className={cn(
                               "w-full text-left px-4 py-2 flex items-center gap-3",
                               "transition-colors duration-100",
