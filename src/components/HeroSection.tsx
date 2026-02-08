@@ -223,8 +223,9 @@ export default function HeroSection() {
       // Frame timing
       const delta = lastTime ? now - lastTime : 16.67;
 
-      // Mobile: skip frames to cap at ~30fps
-      if (mobile && delta < 30 && lastTime > 0) {
+      // Cap at 60fps (prevents flickering on 120Hz+ displays)
+      const minDelta = mobile ? 30 : 16;
+      if (delta < minDelta && lastTime > 0) {
         requestAnimationFrame(render);
         return;
       }
