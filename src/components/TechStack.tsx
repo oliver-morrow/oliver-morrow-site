@@ -71,7 +71,7 @@ export default function TechStack() {
                 {category.skills.map((skill) => (
                   <span
                     key={skill.name}
-                    className="text-zinc-300 text-sm font-mono px-3 py-1 rounded-full border border-zinc-800 hover:border-cyan-500 hover:text-cyan-500 cursor-help transition-all duration-200"
+                    className="text-zinc-300 text-sm font-mono px-3 py-1 rounded-full bg-[rgba(9,9,11,0.4)] border border-glass-specular backdrop-blur-sm hover:border-accent hover:text-accent hover:bg-[rgba(6,182,212,0.06)] hover:shadow-[0_0_8px_rgba(6,182,212,0.1)] cursor-help transition-all duration-200"
                     onMouseEnter={(e) => handleMouseEnter(e, skill)}
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
@@ -87,7 +87,7 @@ export default function TechStack() {
         {/* Inspection tooltip — positioned imperatively to avoid re-renders */}
         <div
           ref={tooltipRef}
-          className="pointer-events-none absolute z-50 bg-black border border-cyan-500/50 rounded px-3 py-2 shadow-2xl shadow-cyan-900/20"
+          className="pointer-events-none absolute z-50 glass-light rounded-md px-3 py-2 shadow-[0_4px_20px_rgba(0,0,0,0.5),0_0_8px_rgba(6,182,212,0.1)]"
           style={{ display: "none" }}
         >
           {activeSkill && (

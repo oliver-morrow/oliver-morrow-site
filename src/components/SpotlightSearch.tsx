@@ -166,7 +166,7 @@ export default function SpotlightSearch() {
           {/* Backdrop */}
           <motion.div
             key="spotlight-backdrop"
-            className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-[4px]"
+            className="fixed inset-0 z-[70] glass-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -181,8 +181,7 @@ export default function SpotlightSearch() {
           >
             <motion.div
               className={cn(
-                "relative card-noise rounded-lg overflow-hidden",
-                "bg-card border border-border",
+                "relative card-noise rounded-lg overflow-hidden glass-heavy glass-specular",
                 "w-full max-w-xl shadow-2xl shadow-black/80",
                 "pointer-events-auto",
               )}

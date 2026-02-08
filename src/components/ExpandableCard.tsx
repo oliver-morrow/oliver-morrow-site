@@ -60,7 +60,7 @@ export default function ExpandableCard({
                 {/* Backdrop */}
                 <motion.div
                   key={`backdrop-${id}`}
-                  className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-[4px]"
+                  className="fixed inset-0 z-[60] glass-backdrop"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -73,8 +73,7 @@ export default function ExpandableCard({
                   <motion.div
                     layoutId={`card-${id}`}
                     className={cn(
-                      "relative card-noise rounded-lg",
-                      "bg-card border border-border",
+                      "relative card-noise rounded-lg glass-heavy glass-specular",
                       "w-full max-w-2xl max-h-[80vh] overflow-y-auto",
                       "pointer-events-auto",
                     )}

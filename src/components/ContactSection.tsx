@@ -17,10 +17,10 @@ const socialLinks = [
 ];
 
 const inputClasses = cn(
-  "w-full bg-card border border-border rounded-lg px-3 py-2.5",
+  "w-full glass-input rounded-lg px-3 py-2.5",
   "font-mono text-sm text-text-primary placeholder:text-text-muted/40",
-  "outline-none transition-colors duration-150",
-  "focus:border-accent caret-cyan-500",
+  "outline-none",
+  "caret-cyan-500",
 );
 
 export default function ContactSection() {
@@ -149,10 +149,12 @@ export default function ContactSection() {
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
+                  "relative overflow-hidden",
                   "font-mono text-sm uppercase tracking-widest px-6 py-2.5 rounded-lg",
-                  "border border-accent text-accent font-bold",
+                  "glass-light glass-specular",
+                  "border-glass-border-hover text-accent font-bold",
                   "transition-all duration-150",
-                  "hover:bg-accent/10 hover:shadow-[0_0_12px_rgba(6,182,212,0.3)]",
+                  "hover:border-accent hover:shadow-[0_0_20px_rgba(6,182,212,0.2),inset_0_0_12px_rgba(6,182,212,0.1)]",
                   "active:scale-[0.97]",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                 )}

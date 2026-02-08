@@ -20,10 +20,8 @@ export default function ProjectGrid() {
               id={`proj-${project.id}`}
               className={cn(
                 "group relative card-noise rounded-lg",
-                "flex flex-col bg-card",
-                "border border-border",
+                "flex flex-col glass glass-specular",
                 "transition-colors duration-200",
-                "hover:border-border-hover",
                 project.featured && "md:col-span-2",
               )}
               collapsedContent={

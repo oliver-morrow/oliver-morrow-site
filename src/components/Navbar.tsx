@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, Search } from "lucide-react";
 import SpotlightSearch from "./SpotlightSearch";
 import { siteConfig } from "@/data/portfolio";
@@ -24,6 +25,8 @@ const socialLinks = [
 
 const BUILD_TIME = Number(process.env.NEXT_PUBLIC_BUILD_TIME) || Date.now();
 
+const DRAG_THRESHOLD = 5;
+
 function formatUptime(ms: number): string {
   const s = Math.floor(ms / 1000);
   const d = Math.floor(s / 86400);
@@ -38,6 +41,8 @@ function formatUptime(ms: number): string {
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const uptimeRef = useRef<HTMLSpanElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const draggedRef = useRef(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -57,14 +62,26 @@ export default function Navbar() {
     return () => clearInterval(id);
   }, []);
 
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent, href: string) => {
+      if (draggedRef.current) {
+        e.preventDefault();
+        return;
+      }
+      e.preventDefault();
+      const el = document.querySelector(href);
+      el?.scrollIntoView({ behavior: "smooth" });
+    },
+    [],
+  );
+
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        "border-b border-border",
         scrolled
-          ? "bg-bg/80 backdrop-blur-md"
-          : "bg-bg/50 backdrop-blur-sm"
+          ? "glass glass-specular"
+          : "bg-bg/30 backdrop-blur-sm border-b border-border/50"
       )}
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -77,20 +94,50 @@ export default function Navbar() {
             olivermorrow
           </a>
 
-          {/* Center — nav links */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Center — draggable glass nav pills */}
+          <nav ref={navRef} className="hidden md:flex items-center gap-1.5">
             {navLinks.map((link) => (
-              <a
+              <motion.a
                 key={link.href}
                 href={link.href}
+                drag
+                dragConstraints={navRef}
+                dragElastic={0.15}
+                dragTransition={{
+                  bounceStiffness: 300,
+                  bounceDamping: 20,
+                }}
+                onDragStart={() => {
+                  draggedRef.current = false;
+                }}
+                onDrag={(_, info) => {
+                  if (
+                    Math.abs(info.offset.x) > DRAG_THRESHOLD ||
+                    Math.abs(info.offset.y) > DRAG_THRESHOLD
+                  ) {
+                    draggedRef.current = true;
+                  }
+                }}
+                onDragEnd={() => {
+                  setTimeout(() => {
+                    draggedRef.current = false;
+                  }, 50);
+                }}
+                onClick={(e) => handleNavClick(e, link.href)}
+                whileTap={{ scale: 0.96 }}
                 className={cn(
-                  "px-3 py-1.5 rounded font-mono text-xs uppercase tracking-widest",
-                  "text-text-muted hover:text-accent hover:bg-accent-glow",
-                  "transition-all duration-200"
+                  "px-3 py-1.5 rounded-full font-mono text-xs uppercase tracking-widest",
+                  "text-text-muted hover:text-accent",
+                  "bg-[rgba(9,9,11,0.4)] border border-glass-specular",
+                  "backdrop-blur-sm",
+                  "hover:border-glass-border-hover hover:bg-[rgba(6,182,212,0.06)]",
+                  "hover:shadow-[0_0_8px_rgba(6,182,212,0.1)]",
+                  "transition-all duration-200",
+                  "cursor-grab active:cursor-grabbing select-none",
                 )}
               >
                 {link.label}
-              </a>
+              </motion.a>
             ))}
           </nav>
 
@@ -107,7 +154,7 @@ export default function Navbar() {
               }
               className={cn(
                 "hidden sm:flex items-center gap-1.5 px-2 py-1 rounded",
-                "border border-border hover:border-border-hover",
+                "glass-light",
                 "font-mono text-[10px] text-text-muted hover:text-accent",
                 "transition-all duration-200",
               )}

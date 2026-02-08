@@ -17,9 +17,8 @@ export default function EducationSection() {
               key={edu.school}
               className={cn(
                 "relative card-noise rounded-lg p-5",
-                "bg-card border border-border",
+                "glass glass-specular",
                 "transition-colors duration-200",
-                "hover:border-border-hover",
               )}
             >
               <div className="relative z-10">
