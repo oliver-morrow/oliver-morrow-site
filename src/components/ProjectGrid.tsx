@@ -4,18 +4,14 @@ import { ArrowUpRight } from "lucide-react";
 import { projects } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 import SectionReveal from "./SectionReveal";
+import SectionHeader from "./SectionHeader";
 import ExpandableCard from "./ExpandableCard";
 
 export default function ProjectGrid() {
   return (
     <SectionReveal>
       <section id="projects" className="mx-auto max-w-6xl px-4 sm:px-6 py-20">
-        <div className="mb-12">
-          <h2 className="text-5xl sm:text-6xl font-black tracking-tighter text-text-primary uppercase">
-            Projects
-          </h2>
-          <div className="mt-4 h-px w-16 bg-border" />
-        </div>
+        <SectionHeader title="Projects" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {projects.map((project) => (

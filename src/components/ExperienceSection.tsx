@@ -3,18 +3,14 @@
 import { experience } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 import SectionReveal from "./SectionReveal";
+import SectionHeader from "./SectionHeader";
 import ExpandableCard from "./ExpandableCard";
 
 export default function ExperienceSection() {
   return (
     <SectionReveal>
       <section id="experience" className="mx-auto max-w-6xl px-4 sm:px-6 py-20">
-        <div className="mb-12">
-          <h2 className="text-5xl sm:text-6xl font-black tracking-tighter text-text-primary uppercase">
-            Experience
-          </h2>
-          <div className="mt-4 h-px w-16 bg-border" />
-        </div>
+        <SectionHeader title="Experience" />
 
         <div className="space-y-4">
           {experience.map((exp) => (
