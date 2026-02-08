@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     const safeSubject = subject.replace(/[\r\n]/g, "");
 
     const { error } = await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>",
+      from: "Contact Form <noreply@olivermorrow.ca>",
       to: CONTACT_EMAIL,
       replyTo: email,
       subject: `[Portfolio] ${safeSubject}`,
