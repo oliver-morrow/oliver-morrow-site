@@ -1,0 +1,35 @@
+name: CI / Quality Gate
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [main] # Or 'prod' if you renamed it
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚨 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🧹 Lint Check
+        run: npm run lint
+        # This will fail if you have "any" types or unused vars
+
+      - name: 📐 Type Check
+        run: npx tsc --noEmit
+        # This ensures you didn't break the build logic
+
+      - name: 🏗️ Build Test
+        run: npm run build
+        # Triggers a Vercel-like build to ensure no Next.js errors
