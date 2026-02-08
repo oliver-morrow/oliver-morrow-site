@@ -4,7 +4,7 @@ export const siteConfig: SiteConfig = {
   profile: {
     name: "Oliver Morrow",
     title: "Computer & Data Engineering",
-    bio: "Bridging hardware constraints with data scale. Specializing in Embedded Systems, Snowflake Architecture, and High-Performance ELT Pipelines.",
+    bio: "Computer Engineering student building data platforms, embedded systems, and everything in between.",
     socials: {
       github: "https://github.com/oliver-morrow",
       linkedin: "https://linkedin.com/in/oliver-morrow",
