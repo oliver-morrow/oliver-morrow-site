@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail, Search } from "lucide-react";
+import SpotlightSearch from "./SpotlightSearch";
 import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
@@ -100,6 +101,22 @@ export default function Navbar() {
               <span ref={uptimeRef} />
             </div>
 
+            <button
+              onClick={() =>
+                document.dispatchEvent(new Event("spotlight:open"))
+              }
+              className={cn(
+                "hidden sm:flex items-center gap-1.5 px-2 py-1 rounded",
+                "border border-border hover:border-border-hover",
+                "font-mono text-[10px] text-text-muted hover:text-accent",
+                "transition-all duration-200",
+              )}
+              aria-label="Search (Cmd+K)"
+            >
+              <Search className="h-3 w-3" />
+              <kbd className="font-mono">⌘K</kbd>
+            </button>
+
             <div className="h-4 w-px bg-border hidden sm:block" />
 
             {/* Social icons */}
@@ -124,6 +141,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      <SpotlightSearch />
     </header>
   );
 }
