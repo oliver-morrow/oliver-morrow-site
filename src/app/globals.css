@@ -62,6 +62,11 @@ body {
   font-family: var(--font-sans);
 }
 
+/* ── Scroll offset for fixed navbar ─────────────────────────── */
+section[id] {
+  scroll-margin-top: 4rem;
+}
+
 /* ── Card noise overlay ──────────────────────────────────────── */
 .card-noise::before {
   content: "";
