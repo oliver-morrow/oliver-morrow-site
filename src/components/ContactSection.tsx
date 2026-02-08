@@ -5,6 +5,7 @@ import { Github, Linkedin, Mail } from "lucide-react";
 import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 import SectionReveal from "./SectionReveal";
+import SectionHeader from "./SectionHeader";
 
 const { socials } = siteConfig.profile;
 const commitHash = process.env.NEXT_PUBLIC_COMMIT_SHA?.substring(0, 7) || "DEV";
@@ -15,8 +16,17 @@ const socialLinks = [
   { icon: Mail, href: `mailto:${socials.email}`, label: "Email" },
 ];
 
+const inputClasses = cn(
+  "w-full bg-card border border-border rounded-lg px-3 py-2.5",
+  "font-mono text-sm text-text-primary placeholder:text-text-muted/40",
+  "outline-none transition-colors duration-150",
+  "focus:border-accent caret-cyan-500",
+);
+
 export default function ContactSection() {
-  const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [latency, setLatency] = useState<number | null>(null);
   const [location, setLocation] = useState<string | null>(null);
 
@@ -31,87 +41,126 @@ export default function ContactSection() {
     setLocation(city);
   }, []);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
     const form = e.currentTarget;
     const data = new FormData(form);
     const email = data.get("email") as string;
+    const subject = data.get("subject") as string;
     const message = data.get("message") as string;
 
-    window.location.href = `mailto:${socials.email}?subject=Contact from ${encodeURIComponent(email)}&body=${encodeURIComponent(message)}`;
-    setSent(true);
-    form.reset();
+    try {
+      const res = await fetch("/api/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, subject, message }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.error || "Failed to send message");
+      }
+
+      setIsSuccess(true);
+      form.reset();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <>
       <SectionReveal>
         <section id="contact" className="mx-auto max-w-6xl px-4 sm:px-6 py-20">
-          <div className="mb-12">
-            <h2 className="text-5xl sm:text-6xl font-black tracking-tighter text-text-primary uppercase">
-              Contact
-            </h2>
-            <div className="mt-4 h-px w-16 bg-border" />
-          </div>
+          <SectionHeader title="Contact" />
 
-          <form onSubmit={handleSubmit} className="w-full space-y-6">
-            <div>
-              <label
-                htmlFor="email"
-                className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="you@domain.com"
-                className={cn(
-                  "w-full bg-card border border-border rounded-lg px-3 py-2.5",
-                  "font-mono text-sm text-text-primary placeholder:text-text-muted/40",
-                  "outline-none transition-colors duration-150",
-                  "focus:border-accent caret-cyan-500",
-                )}
-              />
+          {isSuccess ? (
+            <div className="font-mono text-sm uppercase tracking-widest text-accent leading-relaxed">
+              {"[ MESSAGE RECEIVED :: I'll get back to you shortly ]"}
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="w-full space-y-6">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  disabled={isSubmitting}
+                  placeholder="you@domain.com"
+                  className={inputClasses}
+                />
+              </div>
 
-            <div>
-              <label
-                htmlFor="message"
-                className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
-              >
-                Message
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                required
-                rows={4}
-                placeholder="Write your message..."
-                className={cn(
-                  "w-full bg-card border border-border rounded-lg px-3 py-2.5 resize-none",
-                  "font-mono text-sm text-text-primary placeholder:text-text-muted/40",
-                  "outline-none transition-colors duration-150",
-                  "focus:border-accent caret-cyan-500",
-                )}
-              />
-            </div>
+              <div>
+                <label
+                  htmlFor="subject"
+                  className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
+                >
+                  Subject
+                </label>
+                <input
+                  id="subject"
+                  name="subject"
+                  type="text"
+                  required
+                  disabled={isSubmitting}
+                  placeholder="What is this regarding?"
+                  className={inputClasses}
+                />
+              </div>
 
-            <button
-              type="submit"
-              className={cn(
-                "font-mono text-sm uppercase tracking-widest px-6 py-2.5 rounded-lg",
-                "bg-accent text-black font-bold",
-                "transition-all duration-100",
-                "hover:bg-accent/90",
-                "active:scale-[0.97]"
+              <div>
+                <label
+                  htmlFor="message"
+                  className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
+                >
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  disabled={isSubmitting}
+                  rows={4}
+                  placeholder="Write your message..."
+                  className={cn(inputClasses, "resize-none")}
+                />
+              </div>
+
+              {error && (
+                <p className="font-mono text-xs uppercase tracking-widest text-red-500">
+                  {`[ ERROR :: ${error} ]`}
+                </p>
               )}
-            >
-              {sent ? "Sent" : "Send"}
-            </button>
-          </form>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={cn(
+                  "font-mono text-sm uppercase tracking-widest px-6 py-2.5 rounded-lg",
+                  "border border-accent text-accent font-bold",
+                  "transition-all duration-150",
+                  "hover:bg-accent/10 hover:shadow-[0_0_12px_rgba(6,182,212,0.3)]",
+                  "active:scale-[0.97]",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                )}
+              >
+                {isSubmitting ? "[ SENDING... ]" : "[ SUBMIT ]"}
+              </button>
+            </form>
+          )}
         </section>
       </SectionReveal>
 

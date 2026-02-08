@@ -103,13 +103,23 @@ export default function HeroSection() {
   // Parse hardware stats (0 while still probing)
   const detected = stats.cpu !== "CALCULATING_CORES...";
   const cores = detected ? parseInt(stats.cpu) || 4 : 0;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+  }, []);
+
   const targetGrid = cores > 0
-    ? cores >= 8 ? 320
+    ? isMobile ? 96
+    : cores >= 8 ? 320
     : cores >= 4 ? 192
     : 192
     : 0;
   const [gridSize, setGridSize] = useState(0);
-  const gridTier = gridSize >= 320 ? "UNLEASHED" : gridSize >= 192 ? "STANDARD" : "COMPAT";
+  const gridTier = gridSize >= 320 ? "UNLEASHED"
+    : gridSize >= 192 ? "STANDARD"
+    : gridSize <= 96 ? "THERMAL_SAFE"
+    : "COMPAT";
   const downgradedRef = useRef(false);
 
   // Set initial grid size once cores are detected
@@ -138,6 +148,7 @@ export default function HeroSection() {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
+    const mobile = isMobile;
     const total = gridSize * gridSize;
     const stability = new Float32Array(total);
     const noise = new Float32Array(total);
@@ -202,6 +213,13 @@ export default function HeroSection() {
 
       // Frame timing
       const delta = lastTime ? now - lastTime : 16.67;
+
+      // Mobile: skip frames to cap at ~30fps
+      if (mobile && delta < 30 && lastTime > 0) {
+        requestAnimationFrame(render);
+        return;
+      }
+
       lastTime = now;
       frame++;
 
@@ -212,7 +230,7 @@ export default function HeroSection() {
           else if (now - slowFrameStart > 3000) {
             const lower = gridSize >= 320 ? 192 : 128;
             downgradedRef.current = true;
-            setGridSize(lower);
+            queueMicrotask(() => setGridSize(lower));
           }
         } else {
           slowFrameStart = 0;
@@ -393,7 +411,7 @@ export default function HeroSection() {
     return () => {
       running = false;
     };
-  }, [gridSize, activeTexture, textureReady]);
+  }, [gridSize, activeTexture, textureReady, isMobile]);
 
   /* ── Resize observer ─────────────────────────────────────── */
   useEffect(() => {
@@ -516,7 +534,7 @@ export default function HeroSection() {
           <div className="relative w-full max-w-120">
             <canvas
               ref={canvasRef}
-              className="w-full aspect-square drop-shadow-[0_0_10px_rgba(6,182,212,0.5)] cursor-crosshair"
+              className={`w-full aspect-square cursor-crosshair${isMobile ? "" : " drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]"}`}
               onPointerMove={handlePointerMove}
               onPointerLeave={handlePointerLeave}
             />

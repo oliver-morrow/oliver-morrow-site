@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { skills } from "@/data/portfolio";
 import type { Skill } from "@/types";
 import SectionReveal from "./SectionReveal";
+import SectionHeader from "./SectionHeader";
 
 const levelLabel: Record<Skill["level"], string> = {
   kernel: "Advanced",
@@ -18,31 +19,38 @@ const levelBar: Record<Skill["level"], string> = {
 };
 
 export default function TechStack() {
-  const [tooltip, setTooltip] = useState<{ skill: Skill; x: number; y: number } | null>(null);
+  const [activeSkill, setActiveSkill] = useState<Skill | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  // Position tooltip imperatively — no re-renders on mousemove
+  const moveTooltip = useCallback((e: React.MouseEvent) => {
+    const rect = sectionRef.current?.getBoundingClientRect();
+    const el = tooltipRef.current;
+    if (!rect || !el) return;
+    el.style.left = `${e.clientX - rect.left + 12}px`;
+    el.style.top = `${e.clientY - rect.top - 8}px`;
+  }, []);
 
   const handleMouseEnter = useCallback((e: React.MouseEvent, skill: Skill) => {
-    const rect = sectionRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setTooltip({
-      skill,
-      x: e.clientX - rect.left + 12,
-      y: e.clientY - rect.top - 8,
-    });
-  }, []);
+    setActiveSkill(skill);
+    moveTooltip(e);
+  }, [moveTooltip]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!tooltip) return;
-    const rect = sectionRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setTooltip((prev) =>
-      prev ? { ...prev, x: e.clientX - rect.left + 12, y: e.clientY - rect.top - 8 } : null
-    );
-  }, [tooltip]);
+    moveTooltip(e);
+  }, [moveTooltip]);
 
   const handleMouseLeave = useCallback(() => {
-    setTooltip(null);
+    setActiveSkill(null);
   }, []);
+
+  // Sync tooltip visibility
+  useEffect(() => {
+    const el = tooltipRef.current;
+    if (!el) return;
+    el.style.display = activeSkill ? "block" : "none";
+  }, [activeSkill]);
 
   return (
     <SectionReveal>
@@ -51,12 +59,7 @@ export default function TechStack() {
         id="skills"
         className="relative mx-auto max-w-6xl px-4 sm:px-6 py-20"
       >
-        <div className="mb-12">
-          <h2 className="text-5xl sm:text-6xl font-black tracking-tighter text-text-primary uppercase">
-            Technologies
-          </h2>
-          <div className="mt-4 h-px w-16 bg-border" />
-        </div>
+        <SectionHeader title="Technologies" />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {skills.map((category) => (
@@ -81,22 +84,25 @@ export default function TechStack() {
           ))}
         </div>
 
-        {/* Inspection tooltip */}
-        {tooltip && (
-          <div
-            className="pointer-events-none absolute z-50 bg-black border border-cyan-500/50 rounded px-3 py-2 shadow-2xl shadow-cyan-900/20"
-            style={{ left: tooltip.x, top: tooltip.y }}
-          >
-            <p className="text-[10px] font-mono text-cyan-500">
-              {levelLabel[tooltip.skill.level]} {levelBar[tooltip.skill.level]}
-            </p>
-            {tooltip.skill.usedAt.length > 0 && (
-              <p className="text-[10px] font-mono text-zinc-500 mt-1">
-                Used at: {tooltip.skill.usedAt.join(", ")}
+        {/* Inspection tooltip — positioned imperatively to avoid re-renders */}
+        <div
+          ref={tooltipRef}
+          className="pointer-events-none absolute z-50 bg-black border border-cyan-500/50 rounded px-3 py-2 shadow-2xl shadow-cyan-900/20"
+          style={{ display: "none" }}
+        >
+          {activeSkill && (
+            <>
+              <p className="text-[10px] font-mono text-cyan-500">
+                {levelLabel[activeSkill.level]} {levelBar[activeSkill.level]}
               </p>
-            )}
-          </div>
-        )}
+              {activeSkill.usedAt.length > 0 && (
+                <p className="text-[10px] font-mono text-zinc-500 mt-1">
+                  Used at: {activeSkill.usedAt.join(", ")}
+                </p>
+              )}
+            </>
+          )}
+        </div>
       </section>
     </SectionReveal>
   );

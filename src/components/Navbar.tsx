@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Github, Linkedin, Mail } from "lucide-react";
 import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ function formatUptime(ms: number): string {
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [uptime, setUptime] = useState<string | null>(null);
+  const uptimeRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -43,8 +43,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Update uptime imperatively — avoids re-rendering the entire navbar every second
   useEffect(() => {
-    const tick = () => setUptime(formatUptime(Date.now() - BUILD_TIME));
+    const tick = () => {
+      if (uptimeRef.current) {
+        uptimeRef.current.textContent = formatUptime(Date.now() - BUILD_TIME);
+      }
+    };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
@@ -89,12 +94,10 @@ export default function Navbar() {
 
           {/* Right — uptime + socials */}
           <div className="flex items-center gap-3">
-            {uptime && (
-              <div className="hidden sm:flex items-center gap-1.5 font-mono text-xs text-text-muted">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-dot" />
-                <span>{uptime}</span>
-              </div>
-            )}
+            <div className="hidden sm:flex items-center gap-1.5 font-mono text-xs text-text-muted">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-dot" />
+              <span ref={uptimeRef} />
+            </div>
 
             <div className="h-4 w-px bg-border hidden sm:block" />
 
