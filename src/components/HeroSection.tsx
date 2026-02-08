@@ -12,15 +12,9 @@ const STABILITY_THRESHOLD = 0.8;
 const NOISE_TICK_FAST = 6; // normal: re-roll noise every 6 frames
 const NOISE_TICK_SLOW = 10; // throttled: when delta > 32ms (below 30fps)
 const SCRAMBLE_RADIUS_CSS = 50;
-const HEAP_SPIKE_THRESHOLD = 0.5; // MB change that triggers a glitch
+const HEAP_SPIKE_THRESHOLD = 5; // MB change that triggers a glitch
 const HEAP_SPIKE_ENTROPY = 0.03; // fraction of pixels to destabilize on GC
-
-/* ── Interactive physics (desktop only) ──────────────────── */
-const PHYSICS_RADIUS_CSS = 150;
-const REPEL_STRENGTH = 2;
-const SPRING_K = 0.045;
-const DRAG = 0.86;
-const BRIGHT_BOOST = 0.3;
+const HEAP_SPIKE_COOLDOWN = 3000; // ms between heap-spike glitches
 
 /* ── Hero texture rotation ────────────────────────────────── */
 type HeroTexture = {
@@ -38,11 +32,13 @@ const FALLBACK_TEXTURE: HeroTexture = {
   label: "SYSTEM::FALLBACK_V1",
 };
 
-/* ── Halftone size (schematic sharpening curve) ───────────── */
-function halftoneScale(b: number): number {
-  if (b < 0.1) return 0; // noise gate — keep background pitch black
-  const sharp = Math.pow(b, 1.2); // push dark greys to black, pop bright lines
-  return Math.min(0.7, sharp);
+/* ── Pre-computed halftone LUT (brightness → pixel alpha) ─── */
+const HALFTONE_LUT = new Uint8Array(256);
+for (let i = 0; i < 256; i++) {
+  const b = i / 255;
+  if (b < 0.1) continue; // noise gate — keep background pitch black
+  const scale = Math.min(0.7, Math.pow(b, 1.2));
+  HALFTONE_LUT[i] = Math.round(scale * 364); // 0.7 → 255
 }
 
 /* ── Framer variants ───────────────────────────────────────── */
@@ -147,7 +143,7 @@ export default function HeroSection() {
     if (!textureReady) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: true });
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
     const mobile = isMobile;
@@ -155,19 +151,23 @@ export default function HeroSection() {
     const stability = new Float32Array(total);
     const noise = new Float32Array(total);
     for (let i = 0; i < total; i++) noise[i] = Math.random();
-    // Physics arrays (displacement + velocity per dot, desktop only)
-    const offX = new Float32Array(total);
-    const offY = new Float32Array(total);
-    const vX = new Float32Array(total);
-    const vY = new Float32Array(total);
-    let physicsOn = !mobile && !downgradedRef.current;
     let brightness: Float32Array | null = null;
     let frame = 0;
     let lastTime = 0;
     let prevHeap = 0;
+    let lastHeapSpike = 0;
     let smoothDelta = 16.67; // EMA for stable FPS readout
     let slowFrameStart = 0; // timestamp when slow frames began
     let lastTelemetry = 0; // throttle DOM writes to 2x/sec
+
+    // Offscreen pixel buffer — replaces 65K fillRect with one putImageData + drawImage
+    const blitCvs = document.createElement("canvas");
+    blitCvs.width = gridSize;
+    blitCvs.height = gridSize;
+    const blitCtx = blitCvs.getContext("2d")!;
+    const imgData = blitCtx.createImageData(gridSize, gridSize);
+    const pixels32 = new Uint32Array(imgData.data.buffer);
+    const CYAN32 = 0x00D4B606; // #06b6d4 as ABGR (little-endian, alpha=0)
 
     // Load image → grayscale → brightness map (invert depends on texture)
     const img = new Image();
@@ -223,8 +223,8 @@ export default function HeroSection() {
       // Frame timing
       const delta = lastTime ? now - lastTime : 16.67;
 
-      // Cap at 60fps (prevents flickering on 120Hz+ displays)
-      const minDelta = mobile ? 30 : 16;
+      // Throttle high-refresh displays (120Hz+) without skipping 60Hz frames
+      const minDelta = mobile ? 30 : 12;
       if (delta < minDelta && lastTime > 0) {
         requestAnimationFrame(render);
         return;
@@ -249,15 +249,14 @@ export default function HeroSection() {
 
       // BINDING: FPS → Animation Speed
       const noiseTick = delta > 32 ? NOISE_TICK_SLOW : NOISE_TICK_FAST;
-      if (frame % noiseTick === 0) {
-        for (let i = 0; i < total; i++) noise[i] = Math.random();
-      }
+      const rerollNoise = frame % noiseTick === 0;
 
       // BINDING: Memory → Entropy (heap spikes destabilize pixels)
       const mem = getHeapMemory();
       if (mem) {
         const heapMB = mem.usedJSHeapSize / 1048576;
-        if (prevHeap > 0 && Math.abs(heapMB - prevHeap) > HEAP_SPIKE_THRESHOLD) {
+        if (prevHeap > 0 && Math.abs(heapMB - prevHeap) > HEAP_SPIKE_THRESHOLD && now - lastHeapSpike > HEAP_SPIKE_COOLDOWN) {
+          lastHeapSpike = now;
           for (let i = 0; i < total; i++) {
             if (Math.random() < HEAP_SPIKE_ENTROPY) stability[i] = 0;
           }
@@ -272,8 +271,6 @@ export default function HeroSection() {
       const cellH = h / gridSize;
       const scrambleR = SCRAMBLE_RADIUS_CSS * dpr;
       const scrambleR2 = scrambleR * scrambleR;
-      const physicsR = PHYSICS_RADIUS_CSS * dpr;
-      const physicsR2 = physicsR * physicsR;
       const mouse = mouseRef.current;
 
       ctx.clearRect(0, 0, w, h);
@@ -315,112 +312,55 @@ export default function HeroSection() {
               }
             }
 
-            // Physics: repel from cursor + spring back to origin
-            if (physicsOn) {
-              if (mouse) {
-                const px = originX + offX[idx];
-                const py = originY + offY[idx];
-                const dx = px - mouse.x;
-                const dy = py - mouse.y;
-                if (Math.abs(dx) < physicsR && Math.abs(dy) < physicsR) {
-                  const d2 = dx * dx + dy * dy;
-                  if (d2 < physicsR2 && d2 > 1) {
-                    const d = Math.sqrt(d2);
-                    const f = REPEL_STRENGTH * (1 - d / physicsR);
-                    vX[idx] += (dx / d) * f;
-                    vY[idx] += (dy / d) * f;
-                  }
-                }
-              }
-              vX[idx] = (vX[idx] - offX[idx] * SPRING_K) * DRAG;
-              vY[idx] = (vY[idx] - offY[idx] * SPRING_K) * DRAG;
-              offX[idx] += vX[idx];
-              offY[idx] += vY[idx];
-            }
-
             // Advance stability
             if (stability[idx] < 1) {
               stability[idx] = Math.min(stability[idx] + STABILITY_RATE, 1);
             }
 
-            let b =
-              stability[idx] >= STABILITY_THRESHOLD
-                ? brightness[idx]
-                : noise[idx];
-
-            // Brighten displaced dots for visual feedback
-            if (physicsOn) {
-              const disp = Math.abs(offX[idx]) + Math.abs(offY[idx]);
-              if (disp > 0.5) {
-                b = Math.min(1, b + BRIGHT_BOOST * Math.min(1, disp / (physicsR * 0.25)));
-              }
+            let b: number;
+            if (stability[idx] >= STABILITY_THRESHOLD) {
+              b = brightness[idx];
+            } else {
+              if (rerollNoise) noise[idx] = Math.random();
+              b = noise[idx];
             }
-
-            const centerX = originX + offX[idx];
-            const centerY = originY + offY[idx];
 
             if (b > 0.7) {
               // Boxed X — rect + diagonals (added to batched path)
               const sz = cellW * 0.8;
-              const x0 = centerX - sz / 2;
-              const y0 = centerY - sz / 2;
+              const x0 = originX - sz / 2;
+              const y0 = originY - sz / 2;
               ctx.rect(x0, y0, sz, sz);
               ctx.moveTo(x0, y0); ctx.lineTo(x0 + sz, y0 + sz);
               ctx.moveTo(x0 + sz, y0); ctx.lineTo(x0, y0 + sz);
             } else if (b > 0.15) {
               // Plus — crosshair (added to batched path)
               const arm = cellW * 0.35;
-              ctx.moveTo(centerX - arm, centerY); ctx.lineTo(centerX + arm, centerY);
-              ctx.moveTo(centerX, centerY - arm); ctx.lineTo(centerX, centerY + arm);
+              ctx.moveTo(originX - arm, originY); ctx.lineTo(originX + arm, originY);
+              ctx.moveTo(originX, originY - arm); ctx.lineTo(originX, originY + arm);
             } else if (b > 0.05) {
               // Dot — immediate fill (doesn't affect path)
-              ctx.fillRect(centerX - 0.5, centerY - 0.5, 1, 1);
+              ctx.fillRect(originX - 0.5, originY - 0.5, 1, 1);
             }
             // else: empty cell
           }
         }
         ctx.stroke();
       } else {
-        // Normal halftone rendering
-        ctx.fillStyle = ACCENT;
-        ctx.lineWidth = 0.3;
+        // Normal halftone rendering — ImageData fast path
+        pixels32.fill(0);
 
         for (let y = 0; y < gridSize; y++) {
           for (let x = 0; x < gridSize; x++) {
             const idx = y * gridSize + x;
-            const originX = (x + 0.5) * cellW;
-            const originY = (y + 0.5) * cellH;
 
-            // Mouse scramble
+            // Mouse scramble (needs display-space coords)
             if (mouse) {
-              const dx = originX - mouse.x;
-              const dy = originY - mouse.y;
+              const dx = (x + 0.5) * cellW - mouse.x;
+              const dy = (y + 0.5) * cellH - mouse.y;
               if (dx * dx + dy * dy < scrambleR2) {
                 stability[idx] = 0;
               }
-            }
-
-            // Physics: repel from cursor + spring back to origin
-            if (physicsOn) {
-              if (mouse) {
-                const px = originX + offX[idx];
-                const py = originY + offY[idx];
-                const dx = px - mouse.x;
-                const dy = py - mouse.y;
-                if (Math.abs(dx) < physicsR && Math.abs(dy) < physicsR) {
-                  const d2 = dx * dx + dy * dy;
-                  if (d2 < physicsR2 && d2 > 1) {
-                    const d = Math.sqrt(d2);
-                    const f = REPEL_STRENGTH * (1 - d / physicsR);
-                    vX[idx] += (dx / d) * f;
-                    vY[idx] += (dy / d) * f;
-                  }
-                }
-              }
-              vX[idx] = (vX[idx] - offX[idx] * SPRING_K) * DRAG;
-              vY[idx] = (vY[idx] - offY[idx] * SPRING_K) * DRAG;
-              offX[idx] += vX[idx];
-              offY[idx] += vY[idx];
             }
 
             // Advance stability
@@ -428,41 +368,28 @@ export default function HeroSection() {
               stability[idx] = Math.min(stability[idx] + STABILITY_RATE, 1);
             }
 
-            let b =
-              stability[idx] >= STABILITY_THRESHOLD
-                ? brightness[idx]
-                : noise[idx];
-
-            // Brighten displaced dots for visual feedback
-            if (physicsOn) {
-              const disp = Math.abs(offX[idx]) + Math.abs(offY[idx]);
-              if (disp > 0.5) {
-                b = Math.min(1, b + BRIGHT_BOOST * Math.min(1, disp / (physicsR * 0.25)));
-              }
+            let b: number;
+            if (stability[idx] >= STABILITY_THRESHOLD) {
+              b = brightness[idx];
+            } else {
+              if (rerollNoise) noise[idx] = Math.random();
+              b = noise[idx];
             }
 
-            const scale = halftoneScale(b);
-            if (scale === 0) continue;
-
-            const baseW = cellW * scale;
-            const baseH = cellH * scale;
-            const drawX = originX + offX[idx] - baseW / 2;
-            const drawY = originY + offY[idx] - baseH / 2;
-            ctx.fillRect(drawX, drawY, baseW, baseH);
+            const alpha = HALFTONE_LUT[(b * 255) | 0];
+            if (alpha === 0) continue;
+            pixels32[idx] = (alpha << 24) | CYAN32;
           }
         }
+
+        blitCtx.putImageData(imgData, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(blitCvs, 0, 0, w, h);
       }
 
       // ── Telemetry update (imperative DOM writes) ──────────
       // CYCLE: smoothed fps (EMA to avoid flicker)
       smoothDelta += (delta - smoothDelta) * 0.1;
-
-      // Physics safety switch: auto-disable if frame budget exceeded
-      if (physicsOn && frame > 120 && smoothDelta > 16) {
-        physicsOn = false;
-        offX.fill(0); offY.fill(0);
-        vX.fill(0); vY.fill(0);
-      }
 
       // Throttled telemetry update (2x/sec — humans can't read faster)
       if (now - lastTelemetry > 500) {
@@ -501,8 +428,12 @@ export default function HeroSection() {
     const sync = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      const nextW = Math.round(rect.width * dpr);
+      const nextH = Math.round(rect.height * dpr);
+      if (canvas.width !== nextW || canvas.height !== nextH) {
+        canvas.width = nextW;
+        canvas.height = nextH;
+      }
     };
 
     sync();
@@ -514,13 +445,11 @@ export default function HeroSection() {
   /* ── Pointer tracking ────────────────────────────────────── */
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
+      // Use offsetX/offsetY — already element-relative, no rect lookup needed
       const dpr = window.devicePixelRatio || 1;
       mouseRef.current = {
-        x: (e.clientX - rect.left) * dpr,
-        y: (e.clientY - rect.top) * dpr,
+        x: e.nativeEvent.offsetX * dpr,
+        y: e.nativeEvent.offsetY * dpr,
       };
     },
     [],
@@ -614,15 +543,10 @@ export default function HeroSection() {
           <div className="relative w-full max-w-120">
             <canvas
               ref={canvasRef}
-              className={`w-full aspect-square cursor-crosshair${isMobile ? "" : " drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]"}`}
+              className={`w-full aspect-square cursor-crosshair${isMobile ? "" : " shadow-[0_0_10px_rgba(6,182,212,0.5)]"}`}
               onPointerMove={handlePointerMove}
               onPointerLeave={handlePointerLeave}
             />
-            {/* Active texture label */}
-            <div className="absolute top-3 right-3 z-10 font-mono text-[10px] uppercase tracking-widest text-cyan-500/50">
-              {activeTexture.label}
-            </div>
-
             {/* Scanline overlay */}
             <div
               className="absolute inset-0 pointer-events-none opacity-10"
