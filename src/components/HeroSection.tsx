@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/data/portfolio";
 import { useSystemStats } from "@/hooks/useSystemStats";
+import heroTextures from "@/data/hero-textures.json";
 
 /* ── Constants ─────────────────────────────────────────────── */
 const ACCENT = "#06b6d4";
@@ -80,17 +81,12 @@ export default function HeroSection() {
   const [activeTexture, setActiveTexture] = useState<HeroTexture>(FALLBACK_TEXTURE);
   const [textureReady, setTextureReady] = useState(false);
 
-  // Fetch available textures from API, randomly select one
+  // Select a random texture from the build-time manifest
   useEffect(() => {
-    fetch("/api/hero-textures")
-      .then((r) => r.json())
-      .then((textures: HeroTexture[]) => {
-        if (textures.length > 0) {
-          setActiveTexture(textures[Math.floor(Math.random() * textures.length)]);
-        }
-        setTextureReady(true);
-      })
-      .catch(() => setTextureReady(true)); // fallback texture on error
+    if (heroTextures.length > 0) {
+      setActiveTexture(heroTextures[Math.floor(Math.random() * heroTextures.length)]);
+    }
+    setTextureReady(true);
   }, []);
 
   // Telemetry DOM refs (updated imperatively from rAF — zero re-renders)
