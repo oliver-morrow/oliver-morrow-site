@@ -617,11 +617,6 @@ export default function HeroSection() {
               onPointerMove={handlePointerMove}
               onPointerLeave={handlePointerLeave}
             />
-            {/* Active texture label */}
-            <div className="absolute top-3 right-3 z-10 font-mono text-[10px] uppercase tracking-widest text-cyan-500/50">
-              {activeTexture.label}
-            </div>
-
             {/* Scanline overlay */}
             <div
               className="absolute inset-0 pointer-events-none opacity-10"
