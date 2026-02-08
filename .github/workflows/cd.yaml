@@ -1,7 +1,7 @@
 name: 🚀 Promote DEV to PROD
 
 on:
-  workflow_dispatch: # This adds a manual "Run" button in GitHub UI
+  workflow_dispatch:
 
 jobs:
   promote:
@@ -10,9 +10,9 @@ jobs:
       - name: 🚨 Checkout Code
         uses: actions/checkout@v4
         with:
-          ref: main # Check out the target branch
+          ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0 # Fetch all history for merging
+          fetch-depth: 0
 
       - name: 🤖 Configure Git
         run: |
