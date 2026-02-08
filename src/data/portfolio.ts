@@ -103,6 +103,51 @@ export const experience: Experience[] = [
   },
 ];
 
+export const volunteer: Experience[] = [
+  {
+    id: "engsoc-finance-2024",
+    role: "Finance Officer",
+    company: "Engineering Society of Queen's University",
+    period: { start: "Sep 2024", end: "May 2025" },
+    description: "Designed and implemented automated financial management system for 8+ affiliated groups with $2M+ annual budget, achieving 99% payment accuracy.",
+    detailedDescription: [
+      "Designed and implemented automated financial management system using Excel and Power Automate for 8+ affiliated groups with $2M+ annual budget",
+      "Achieved 99% payment accuracy through systematic data analysis and process optimization",
+      "Developed financial reporting systems and monthly analytical reports for diverse stakeholders",
+      "Coordinated complex financial operations across multiple affiliated engineering groups",
+    ],
+    technologies: ["Excel", "Power Automate", "Data Analysis", "Financial Reporting"],
+    type: "volunteer",
+  },
+  {
+    id: "oec-vp-comms-2023",
+    role: "Vice President of Communications",
+    company: "The Ontario Engineering Competition 2024",
+    period: { start: "Jan 2023", end: "Jan 2024" },
+    description: "Led communications team managing stakeholder relationships and coordinating logistics for 300+ competitors across Ontario.",
+    detailedDescription: [
+      "Led communications team managing stakeholder relationships and coordinating complex logistics for 300+ competitors",
+      "Developed comprehensive project documentation and communication systems",
+      "Met sprint goals and delivered results to stakeholders on schedule",
+    ],
+    technologies: ["Project Management", "Stakeholder Relations", "Documentation"],
+    type: "volunteer",
+  },
+  {
+    id: "engsoc-it-2023",
+    role: "IT Operations Team Manager",
+    company: "Engineering Society of Queen's University",
+    period: { start: "Apr 2023", end: "Apr 2024" },
+    description: "Directed IT Operations team managing server infrastructure and system maintenance using Microsoft Azure.",
+    detailedDescription: [
+      "Directed IT Operations team managing server infrastructure and system maintenance",
+      "Implemented process improvements using Microsoft Azure for enhanced operational effectiveness",
+    ],
+    technologies: ["Azure", "IT Infrastructure", "Team Leadership"],
+    type: "volunteer",
+  },
+];
+
 export const projects: Project[] = [
   {
     id: "noteworthy",

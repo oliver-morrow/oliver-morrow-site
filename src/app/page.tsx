@@ -2,6 +2,7 @@ import HeroSection from "@/components/HeroSection";
 import TechStack from "@/components/TechStack";
 import ExperienceSection from "@/components/ExperienceSection";
 import EducationSection from "@/components/EducationSection";
+import VolunteerSection from "@/components/VolunteerSection";
 import ProjectGrid from "@/components/ProjectGrid";
 import ContactSection from "@/components/ContactSection";
 
@@ -12,6 +13,7 @@ export default function Home() {
       <TechStack />
       <ExperienceSection />
       <EducationSection />
+      <VolunteerSection />
       <ProjectGrid />
       <ContactSection />
     </>
