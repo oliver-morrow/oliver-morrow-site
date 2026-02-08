@@ -15,6 +15,13 @@ const SCRAMBLE_RADIUS_CSS = 50;
 const HEAP_SPIKE_THRESHOLD = 0.5; // MB change that triggers a glitch
 const HEAP_SPIKE_ENTROPY = 0.03; // fraction of pixels to destabilize on GC
 
+/* ── Interactive physics (desktop only) ──────────────────── */
+const PHYSICS_RADIUS_CSS = 150;
+const REPEL_STRENGTH = 2;
+const SPRING_K = 0.045;
+const DRAG = 0.86;
+const BRIGHT_BOOST = 0.3;
+
 /* ── Hero texture rotation ────────────────────────────────── */
 type HeroTexture = {
   id: string;
@@ -109,23 +116,18 @@ export default function HeroSection() {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
   }, []);
 
-  const targetGrid = cores > 0
-    ? isMobile ? 96
-    : cores >= 8 ? 320
-    : cores >= 4 ? 192
-    : 192
-    : 0;
-  const [gridSize, setGridSize] = useState(0);
-  const gridTier = gridSize >= 320 ? "UNLEASHED"
-    : gridSize >= 192 ? "STANDARD"
-    : gridSize <= 96 ? "THERMAL_SAFE"
-    : "COMPAT";
+  const [gridSize, setGridSize] = useState(128);
+  const gridTier = gridSize >= 256 ? "UNLEASHED"
+    : gridSize >= 128 ? "STANDARD"
+    : "THERMAL_SAFE";
   const downgradedRef = useRef(false);
 
-  // Set initial grid size once cores are detected
+  // Progressive enhancement: upgrade resolution on capable desktops
   useEffect(() => {
-    if (targetGrid > 0 && gridSize === 0) setGridSize(targetGrid);
-  }, [targetGrid, gridSize]);
+    if (!isMobile && cores > 6 && !downgradedRef.current) {
+      setGridSize(256);
+    }
+  }, [cores, isMobile]);
 
   /* ── Boot text sequencer ─────────────────────────────────── */
   useEffect(() => {
@@ -142,7 +144,7 @@ export default function HeroSection() {
 
   /* ── Canvas render (starts once gridSize is known) ───────── */
   useEffect(() => {
-    if (gridSize === 0 || !textureReady) return;
+    if (!textureReady) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d", { alpha: true });
@@ -153,6 +155,12 @@ export default function HeroSection() {
     const stability = new Float32Array(total);
     const noise = new Float32Array(total);
     for (let i = 0; i < total; i++) noise[i] = Math.random();
+    // Physics arrays (displacement + velocity per dot, desktop only)
+    const offX = new Float32Array(total);
+    const offY = new Float32Array(total);
+    const vX = new Float32Array(total);
+    const vY = new Float32Array(total);
+    let physicsOn = !mobile && !downgradedRef.current;
     let brightness: Float32Array | null = null;
     let frame = 0;
     let lastTime = 0;
@@ -228,7 +236,7 @@ export default function HeroSection() {
         if (smoothDelta > 20) {
           if (slowFrameStart === 0) slowFrameStart = now;
           else if (now - slowFrameStart > 3000) {
-            const lower = gridSize >= 320 ? 192 : 128;
+            const lower = gridSize >= 256 ? 128 : 96;
             downgradedRef.current = true;
             queueMicrotask(() => setGridSize(lower));
           }
@@ -262,6 +270,8 @@ export default function HeroSection() {
       const cellH = h / gridSize;
       const scrambleR = SCRAMBLE_RADIUS_CSS * dpr;
       const scrambleR2 = scrambleR * scrambleR;
+      const physicsR = PHYSICS_RADIUS_CSS * dpr;
+      const physicsR2 = physicsR * physicsR;
       const mouse = mouseRef.current;
 
       ctx.clearRect(0, 0, w, h);
@@ -287,14 +297,39 @@ export default function HeroSection() {
         for (let y = 0; y < gridSize; y++) {
           for (let x = 0; x < gridSize; x++) {
             const idx = y * gridSize + x;
+            const originX = (x + 0.5) * cellW;
+            const originY = (y + 0.5) * cellH;
 
             // Mouse scramble
             if (mouse) {
-              const dx = (x + 0.5) * cellW - mouse.x;
-              const dy = (y + 0.5) * cellH - mouse.y;
+              const dx = originX - mouse.x;
+              const dy = originY - mouse.y;
               if (dx * dx + dy * dy < scrambleR2) {
                 stability[idx] = 0;
               }
+            }
+
+            // Physics: repel from cursor + spring back to origin
+            if (physicsOn) {
+              if (mouse) {
+                const px = originX + offX[idx];
+                const py = originY + offY[idx];
+                const dx = px - mouse.x;
+                const dy = py - mouse.y;
+                if (Math.abs(dx) < physicsR && Math.abs(dy) < physicsR) {
+                  const d2 = dx * dx + dy * dy;
+                  if (d2 < physicsR2 && d2 > 1) {
+                    const d = Math.sqrt(d2);
+                    const f = REPEL_STRENGTH * (1 - d / physicsR);
+                    vX[idx] += (dx / d) * f;
+                    vY[idx] += (dy / d) * f;
+                  }
+                }
+              }
+              vX[idx] = (vX[idx] - offX[idx] * SPRING_K) * DRAG;
+              vY[idx] = (vY[idx] - offY[idx] * SPRING_K) * DRAG;
+              offX[idx] += vX[idx];
+              offY[idx] += vY[idx];
             }
 
             // Advance stability
@@ -302,13 +337,21 @@ export default function HeroSection() {
               stability[idx] = Math.min(stability[idx] + STABILITY_RATE, 1);
             }
 
-            const b =
+            let b =
               stability[idx] >= STABILITY_THRESHOLD
                 ? brightness[idx]
                 : noise[idx];
 
-            const centerX = x * cellW + cellW / 2;
-            const centerY = y * cellH + cellH / 2;
+            // Brighten displaced dots for visual feedback
+            if (physicsOn) {
+              const disp = Math.abs(offX[idx]) + Math.abs(offY[idx]);
+              if (disp > 0.5) {
+                b = Math.min(1, b + BRIGHT_BOOST * Math.min(1, disp / (physicsR * 0.25)));
+              }
+            }
+
+            const centerX = originX + offX[idx];
+            const centerY = originY + offY[idx];
 
             if (b > 0.7) {
               // Boxed X — box + diagonals
@@ -349,14 +392,39 @@ export default function HeroSection() {
         for (let y = 0; y < gridSize; y++) {
           for (let x = 0; x < gridSize; x++) {
             const idx = y * gridSize + x;
+            const originX = (x + 0.5) * cellW;
+            const originY = (y + 0.5) * cellH;
 
             // Mouse scramble
             if (mouse) {
-              const dx = (x + 0.5) * cellW - mouse.x;
-              const dy = (y + 0.5) * cellH - mouse.y;
+              const dx = originX - mouse.x;
+              const dy = originY - mouse.y;
               if (dx * dx + dy * dy < scrambleR2) {
                 stability[idx] = 0;
               }
+            }
+
+            // Physics: repel from cursor + spring back to origin
+            if (physicsOn) {
+              if (mouse) {
+                const px = originX + offX[idx];
+                const py = originY + offY[idx];
+                const dx = px - mouse.x;
+                const dy = py - mouse.y;
+                if (Math.abs(dx) < physicsR && Math.abs(dy) < physicsR) {
+                  const d2 = dx * dx + dy * dy;
+                  if (d2 < physicsR2 && d2 > 1) {
+                    const d = Math.sqrt(d2);
+                    const f = REPEL_STRENGTH * (1 - d / physicsR);
+                    vX[idx] += (dx / d) * f;
+                    vY[idx] += (dy / d) * f;
+                  }
+                }
+              }
+              vX[idx] = (vX[idx] - offX[idx] * SPRING_K) * DRAG;
+              vY[idx] = (vY[idx] - offY[idx] * SPRING_K) * DRAG;
+              offX[idx] += vX[idx];
+              offY[idx] += vY[idx];
             }
 
             // Advance stability
@@ -364,19 +432,27 @@ export default function HeroSection() {
               stability[idx] = Math.min(stability[idx] + STABILITY_RATE, 1);
             }
 
-            const b =
+            let b =
               stability[idx] >= STABILITY_THRESHOLD
                 ? brightness[idx]
                 : noise[idx];
+
+            // Brighten displaced dots for visual feedback
+            if (physicsOn) {
+              const disp = Math.abs(offX[idx]) + Math.abs(offY[idx]);
+              if (disp > 0.5) {
+                b = Math.min(1, b + BRIGHT_BOOST * Math.min(1, disp / (physicsR * 0.25)));
+              }
+            }
 
             const scale = halftoneScale(b);
             if (scale === 0) continue;
 
             const baseW = cellW * scale;
             const baseH = cellH * scale;
-            const cx = x * cellW + (cellW - baseW) / 2;
-            const cy = y * cellH + (cellH - baseH) / 2;
-            ctx.fillRect(cx, cy, baseW, baseH);
+            const drawX = originX + offX[idx] - baseW / 2;
+            const drawY = originY + offY[idx] - baseH / 2;
+            ctx.fillRect(drawX, drawY, baseW, baseH);
           }
         }
       }
@@ -384,6 +460,14 @@ export default function HeroSection() {
       // ── Telemetry update (imperative DOM writes) ──────────
       // CYCLE: smoothed fps (EMA to avoid flicker)
       smoothDelta += (delta - smoothDelta) * 0.1;
+
+      // Physics safety switch: auto-disable if frame budget exceeded
+      if (physicsOn && frame > 120 && smoothDelta > 16) {
+        physicsOn = false;
+        offX.fill(0); offY.fill(0);
+        vX.fill(0); vY.fill(0);
+      }
+
       if (cycleRef.current) {
         const fps = Math.round(1000 / smoothDelta);
         cycleRef.current.textContent = `CYCLE: ${fps}Hz`;
