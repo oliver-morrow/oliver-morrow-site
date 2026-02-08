@@ -167,6 +167,7 @@ export default function HeroSection() {
     let prevHeap = 0;
     let smoothDelta = 16.67; // EMA for stable FPS readout
     let slowFrameStart = 0; // timestamp when slow frames began
+    let lastTelemetry = 0; // throttle DOM writes to 2x/sec
 
     // Load image → grayscale → brightness map (invert depends on texture)
     const img = new Image();
@@ -280,19 +281,23 @@ export default function HeroSection() {
 
       // Schematic mode: draw cell grid + brightness symbols
       if (wireframe) {
-        // 1. Graph paper — stroke every cell boundary
+        // 1. Graph paper — single batched path
         ctx.strokeStyle = "rgba(6,182,212,0.1)";
         ctx.lineWidth = 0.5;
+        ctx.beginPath();
         for (let i = 0; i <= gridSize; i++) {
           const px = i * cellW;
           const py = i * cellH;
-          ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, h); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(w, py); ctx.stroke();
+          ctx.moveTo(px, 0); ctx.lineTo(px, h);
+          ctx.moveTo(0, py); ctx.lineTo(w, py);
         }
+        ctx.stroke();
 
-        // 2. Symbol pass — stroke-only, uniform weight
+        // 2. Symbol pass — batched path, single stroke
         ctx.strokeStyle = ACCENT;
         ctx.lineWidth = 0.5;
+        ctx.fillStyle = ACCENT;
+        ctx.beginPath();
 
         for (let y = 0; y < gridSize; y++) {
           for (let x = 0; x < gridSize; x++) {
@@ -354,36 +359,26 @@ export default function HeroSection() {
             const centerY = originY + offY[idx];
 
             if (b > 0.7) {
-              // Boxed X — box + diagonals
+              // Boxed X — rect + diagonals (added to batched path)
               const sz = cellW * 0.8;
               const x0 = centerX - sz / 2;
               const y0 = centerY - sz / 2;
-              ctx.strokeRect(x0, y0, sz, sz);
-              ctx.beginPath();
+              ctx.rect(x0, y0, sz, sz);
               ctx.moveTo(x0, y0); ctx.lineTo(x0 + sz, y0 + sz);
-              ctx.stroke();
-              ctx.beginPath();
               ctx.moveTo(x0 + sz, y0); ctx.lineTo(x0, y0 + sz);
-              ctx.stroke();
             } else if (b > 0.15) {
-              // Plus — crosshair
+              // Plus — crosshair (added to batched path)
               const arm = cellW * 0.35;
-              ctx.beginPath();
-              ctx.moveTo(centerX - arm, centerY);
-              ctx.lineTo(centerX + arm, centerY);
-              ctx.stroke();
-              ctx.beginPath();
-              ctx.moveTo(centerX, centerY - arm);
-              ctx.lineTo(centerX, centerY + arm);
-              ctx.stroke();
+              ctx.moveTo(centerX - arm, centerY); ctx.lineTo(centerX + arm, centerY);
+              ctx.moveTo(centerX, centerY - arm); ctx.lineTo(centerX, centerY + arm);
             } else if (b > 0.05) {
-              // Dot — single pixel
-              ctx.fillStyle = ACCENT;
+              // Dot — immediate fill (doesn't affect path)
               ctx.fillRect(centerX - 0.5, centerY - 0.5, 1, 1);
             }
             // else: empty cell
           }
         }
+        ctx.stroke();
       } else {
         // Normal halftone rendering
         ctx.fillStyle = ACCENT;
@@ -468,24 +463,24 @@ export default function HeroSection() {
         vX.fill(0); vY.fill(0);
       }
 
-      if (cycleRef.current) {
-        const fps = Math.round(1000 / smoothDelta);
-        cycleRef.current.textContent = `CYCLE: ${fps}Hz`;
-      }
+      // Throttled telemetry update (2x/sec — humans can't read faster)
+      if (now - lastTelemetry > 500) {
+        lastTelemetry = now;
 
-      // HEAP: real or estimated
-      if (heapRef.current) {
-        if (mem) {
-          heapRef.current.textContent = `HEAP: ${(mem.usedJSHeapSize / 1048576).toFixed(1)}MB`;
-        } else {
-          const sim = 12 + Math.sin(now * 0.002) * 3 + Math.sin(now * 0.007) * 1.5;
-          heapRef.current.textContent = `HEAP: ~${sim.toFixed(1)}MB`;
+        if (cycleRef.current) {
+          cycleRef.current.textContent = `CYCLE: ${Math.round(1000 / smoothDelta)}Hz`;
         }
-      }
-
-      // DEBUG: live frame time
-      if (debugFrameRef.current) {
-        debugFrameRef.current.textContent = `FRAME_TIME  ${delta.toFixed(2)}ms`;
+        if (heapRef.current) {
+          if (mem) {
+            heapRef.current.textContent = `HEAP: ${(mem.usedJSHeapSize / 1048576).toFixed(1)}MB`;
+          } else {
+            const sim = 12 + Math.sin(now * 0.002) * 3 + Math.sin(now * 0.007) * 1.5;
+            heapRef.current.textContent = `HEAP: ~${sim.toFixed(1)}MB`;
+          }
+        }
+        if (debugFrameRef.current) {
+          debugFrameRef.current.textContent = `FRAME_TIME  ${smoothDelta.toFixed(2)}ms`;
+        }
       }
 
       requestAnimationFrame(render);

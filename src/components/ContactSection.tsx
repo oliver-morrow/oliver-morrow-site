@@ -81,7 +81,7 @@ export default function ContactSection() {
 
           {isSuccess ? (
             <div className="font-mono text-sm uppercase tracking-widest text-accent leading-relaxed">
-              {"[ MESSAGE RECEIVED :: I'll get back to you shortly ]"}
+              {"MESSAGE RECEIVED — I'LL GET BACK TO YOU SHORTLY"}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="w-full space-y-6">
@@ -141,7 +141,7 @@ export default function ContactSection() {
 
               {error && (
                 <p className="font-mono text-xs uppercase tracking-widest text-red-500">
-                  {`[ ERROR :: ${error} ]`}
+                  {`ERROR — ${error}`}
                 </p>
               )}
 
@@ -157,7 +157,7 @@ export default function ContactSection() {
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                 )}
               >
-                {isSubmitting ? "[ SENDING... ]" : "[ SUBMIT ]"}
+                {isSubmitting ? "SENDING..." : "SUBMIT"}
               </button>
             </form>
           )}
