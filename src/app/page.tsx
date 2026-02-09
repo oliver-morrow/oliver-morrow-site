@@ -4,7 +4,6 @@ import ExperienceSection from "@/components/ExperienceSection";
 import EducationSection from "@/components/EducationSection";
 import VolunteerSection from "@/components/VolunteerSection";
 import ProjectGrid from "@/components/ProjectGrid";
-import RecentWriting from "@/components/RecentWriting";
 import ContactSection from "@/components/ContactSection";
 
 export default function Home() {
@@ -16,7 +15,6 @@ export default function Home() {
       <EducationSection />
       <VolunteerSection />
       <ProjectGrid />
-      <RecentWriting />
       <ContactSection />
     </>
   );
