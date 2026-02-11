@@ -68,12 +68,6 @@ export async function POST(req: Request) {
     const safeName = name.replace(/[\r\n]/g, "");
     const safeSubject = subject.replace(/[\r\n]/g, "");
 
-    const { error } = await resend.emails.send({
-      from: "Contact Form <noreply@olivermorrow.ca>",
-      to: CONTACT_EMAIL,
-      replyTo: email,
-      subject: `[Portfolio] ${safeSubject}`,
-      text: `From: ${safeName} <${email}>\n\n${message}`,
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -85,7 +79,7 @@ export async function POST(req: Request) {
         to: CONTACT_EMAIL,
         reply_to: email,
         subject: `[Portfolio] ${safeSubject}`,
-        text: `From: ${email}\n\n${message}`,
+        text: `From: ${safeName} <${email}>\n\n${message}`,
       }),
     });
 
