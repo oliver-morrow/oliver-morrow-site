@@ -48,6 +48,7 @@ export default function ContactSection() {
 
     const form = e.currentTarget;
     const data = new FormData(form);
+    const name = data.get("name") as string;
     const email = data.get("email") as string;
     const subject = data.get("subject") as string;
     const message = data.get("message") as string;
@@ -56,7 +57,7 @@ export default function ContactSection() {
       const res = await fetch("/api/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, subject, message }),
+        body: JSON.stringify({ name, email, subject, message }),
       });
 
       if (!res.ok) {
@@ -85,22 +86,42 @@ export default function ContactSection() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="w-full space-y-6">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  disabled={isSubmitting}
-                  placeholder="you@domain.com"
-                  className={inputClasses}
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
+                  >
+                    Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    disabled={isSubmitting}
+                    placeholder="Your name"
+                    className={inputClasses}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block font-mono text-xs uppercase tracking-widest text-text-muted mb-2"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    disabled={isSubmitting}
+                    placeholder="you@domain.com"
+                    className={inputClasses}
+                  />
+                </div>
               </div>
 
               <div>
