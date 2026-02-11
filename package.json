@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/generate-hero-manifest.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/generate-hero-manifest.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -15,7 +17,6 @@
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "resend": "^6.9.1",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

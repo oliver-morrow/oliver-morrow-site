@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 
-if (!process.env.RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY is not configured");
-}
+export const runtime = "edge";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "me@olivermorrow.ca";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,6 +29,10 @@ function isRateLimited(ip: string): boolean {
 
 export async function POST(req: Request) {
   try {
+    if (!RESEND_API_KEY) {
+      return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+    }
+
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     if (isRateLimited(ip)) {
       return NextResponse.json(
@@ -73,11 +74,28 @@ export async function POST(req: Request) {
       replyTo: email,
       subject: `[Portfolio] ${safeSubject}`,
       text: `From: ${safeName} <${email}>\n\n${message}`,
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Contact Form <noreply@olivermorrow.ca>",
+        to: CONTACT_EMAIL,
+        reply_to: email,
+        subject: `[Portfolio] ${safeSubject}`,
+        text: `From: ${email}\n\n${message}`,
+      }),
     });
 
-    if (error) {
-      console.error("[/api/send] Resend error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!res.ok) {
+      const data = await res.json();
+      console.error("[/api/send] Resend error:", data);
+      return NextResponse.json(
+        { error: data.message || "Failed to send email" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ success: true });

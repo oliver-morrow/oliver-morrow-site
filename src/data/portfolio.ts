@@ -3,7 +3,7 @@ import type { Experience, Project, SiteConfig, Education, SkillCategory } from "
 export const siteConfig: SiteConfig = {
   profile: {
     name: "Oliver Morrow",
-    title: "Computer & Data Engineering",
+    title: "Computer, Data & Systems Engineering",
     bio: "Computer Engineering student building data platforms, embedded systems, and everything in between.",
     socials: {
       github: "https://github.com/oliver-morrow",
