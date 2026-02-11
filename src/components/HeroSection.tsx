@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/data/portfolio";
 import { useSystemStats } from "@/hooks/useSystemStats";
+import heroTextures from "@/data/hero-textures.json";
 
 /* ── Constants ─────────────────────────────────────────────── */
 const ACCENT = "#06b6d4";
@@ -80,17 +81,12 @@ export default function HeroSection() {
   const [activeTexture, setActiveTexture] = useState<HeroTexture>(FALLBACK_TEXTURE);
   const [textureReady, setTextureReady] = useState(false);
 
-  // Fetch available textures from API, randomly select one
+  // Select a random texture from the build-time manifest
   useEffect(() => {
-    fetch("/api/hero-textures")
-      .then((r) => r.json())
-      .then((textures: HeroTexture[]) => {
-        if (textures.length > 0) {
-          setActiveTexture(textures[Math.floor(Math.random() * textures.length)]);
-        }
-        setTextureReady(true);
-      })
-      .catch(() => setTextureReady(true)); // fallback texture on error
+    if (heroTextures.length > 0) {
+      setActiveTexture(heroTextures[Math.floor(Math.random() * heroTextures.length)]);
+    }
+    setTextureReady(true);
   }, []);
 
   // Telemetry DOM refs (updated imperatively from rAF — zero re-renders)
@@ -461,8 +457,8 @@ export default function HeroSection() {
 
   /* ── JSX ─────────────────────────────────────────────────── */
   return (
-    <section className="relative mx-auto max-w-6xl px-4 sm:px-6">
-      <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 pt-20 sm:pt-24 lg:pt-24 pb-20 sm:pb-28 lg:pb-36">
+    <section className="relative mx-auto max-w-6xl px-4 sm:px-6 min-h-[calc(100dvh-4rem)] flex flex-col justify-center">
+      <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 py-12 sm:py-16 lg:py-20">
         {/* ── Left: Name + Title ─────────────────────────────── */}
         <motion.div
           className="flex-1 min-w-0"

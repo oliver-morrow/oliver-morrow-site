@@ -15,10 +15,10 @@ My portfolio website showcasing professional experience, projects, and technical
 - **Real-time System Stats**: Live uptime counter and animated telemetry displays
 - **Interactive Tech Stack**: Hoverable technology icons with tooltips
 - **Dynamic Hero Canvas**: Halftone effect with texture rotation and stability tracking
-- **Contact Form**: Server-side email handling via Resend API with rate limiting
+- **Contact Form**: Edge-runtime email handling via Resend API with rate limiting
 - **Responsive Design**: Mobile-first approach with optimized layouts for all screen sizes
 - **Performance Optimized**: Imperative DOM updates for high-frequency UI changes to minimize re-renders
-- **Dynamic Textures**: Server-side texture loading for hero section backgrounds
+- **Dynamic Textures**: Build-time texture manifest for hero section backgrounds
 
 ## Tech Stack
 
@@ -31,7 +31,7 @@ My portfolio website showcasing professional experience, projects, and technical
 
 ### Additional Libraries
 - **[Lucide React](https://lucide.dev/)** - Icon library
-- **[Resend](https://resend.com/)** - Email API for contact form
+- **[Resend](https://resend.com/)** - Email API for contact form (called via `fetch`, edge-compatible)
 - **clsx** & **tailwind-merge** - Utility functions for className management
 
 ## Design System
@@ -97,8 +97,8 @@ npm run dev
 ### Available Scripts
 
 ```bash
-npm run dev    # Start development server
-npm run build  # Build for production
+npm run dev    # Generate hero manifest + start development server
+npm run build  # Generate hero manifest + build for production
 npm run start  # Start production server
 npm run lint   # Run ESLint
 ```
@@ -109,8 +109,7 @@ npm run lint   # Run ESLint
 src/
 ├── app/
 │   ├── api/
-│   │   ├── hero-textures/    # Dynamic texture loading endpoint
-│   │   └── send/              # Contact form email endpoint
+│   │   └── send/              # Contact form email endpoint (edge runtime)
 │   ├── globals.css            # Global styles & Tailwind theme
 │   ├── layout.tsx             # Root layout
 │   ├── page.tsx               # Home page
@@ -131,6 +130,7 @@ src/
 │   ├── TechStack.tsx          # Technology icons with tooltips
 │   └── VolunteerSection.tsx   # Volunteer experience
 ├── data/
+│   ├── hero-textures.json     # Auto-generated hero texture manifest
 │   └── portfolio.ts           # Content data (projects, experience, etc.)
 ├── hooks/
 │   ├── useBodyScrollLock.ts   # Modal scroll lock utility
@@ -140,20 +140,18 @@ src/
 │   └── utils.ts               # Utility functions
 └── types/
     └── index.ts               # TypeScript type definitions
+scripts/
+└── generate-hero-manifest.mjs # Build-time hero texture scanner
 ```
 
 ## API Routes
 
 ### `/api/send` - Contact Form
+- **Runtime**: Edge
 - **Method**: POST
-- **Rate Limiting**: 5 requests per minute per IP
-- **Validation**: Name, email, and message fields required
+- **Rate Limiting**: 5 requests per minute per IP (best-effort in edge isolates)
+- **Validation**: Email, subject, and message fields required
 - **Security**: Header injection protection
-
-### `/api/hero-textures` - Texture Assets
-- **Method**: GET
-- **Cache**: 1 hour
-- **Returns**: Array of texture file paths from `public/images/hero/`
 
 ## Performance Patterns
 
@@ -162,7 +160,7 @@ src/
 - **TechStack Tooltip Positioning**: Direct style manipulation for high-frequency mousemove events
 - **rAF Guards**: `queueMicrotask()` wraps state updates inside animation frames to prevent render thrashing
 - **Code Splitting**: Automatic with Next.js App Router
-- **Image Optimization**: Next.js built-in image optimization
+- **Build-time Manifests**: Hero textures scanned at build time, eliminating runtime filesystem access
 
 ## Environment Variables
 
@@ -173,14 +171,15 @@ src/
 
 ## Deployment
 
-This site is optimized for deployment on [Vercel](https://vercel.com):
+This site is deployed on [Cloudflare Pages](https://pages.cloudflare.com):
 
 1. Push your code to GitHub
-2. Import the repository in Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+2. Create a new project in Cloudflare Pages dashboard
+3. Set build command to `npm run build` and output directory to `.next`
+4. Add environment variables (`RESEND_API_KEY`, `CONTACT_EMAIL`) in the Cloudflare dashboard
+5. Deploy
 
-Alternative platforms (Netlify, Cloudflare Pages, etc.) work with standard Next.js deployment configurations.
+Cloudflare provides the `CF_PAGES_COMMIT_SHA` environment variable automatically, which is used for the build hash in the footer.
 
 ## Browser Support
 

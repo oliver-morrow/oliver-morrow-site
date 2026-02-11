@@ -189,7 +189,6 @@ export default function ContactSection() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-zinc-600">
           {/* Left — Copyright */}
           <p>
-            <span className="opacity-50">{"_>"}</span>{" "}
             &copy; {new Date().getFullYear()} {siteConfig.profile.name}
           </p>
 

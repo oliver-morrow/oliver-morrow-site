@@ -1,0 +1,32 @@
+[
+  {
+    "id": "cpu-die-shot",
+    "src": "/images/hero/cpu-die-shot.webp",
+    "invert": true,
+    "label": "SYSTEM::CPU_DIE_SHOT"
+  },
+  {
+    "id": "data-center",
+    "src": "/images/hero/data-center.webp",
+    "invert": true,
+    "label": "SYSTEM::DATA_CENTER"
+  },
+  {
+    "id": "hard-drive",
+    "src": "/images/hero/hard-drive.webp",
+    "invert": true,
+    "label": "SYSTEM::HARD_DRIVE"
+  },
+  {
+    "id": "windows-wallpaper",
+    "src": "/images/hero/windows-wallpaper.webp",
+    "invert": true,
+    "label": "SYSTEM::WINDOWS_WALLPAPER"
+  },
+  {
+    "id": "wireframe-terrain",
+    "src": "/images/hero/wireframe-terrain.webp",
+    "invert": true,
+    "label": "SYSTEM::WIREFRAME_TERRAIN"
+  }
+]
