@@ -9,6 +9,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "me@olivermorrow.ca";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_NAME = 100;
 const MAX_EMAIL = 254;
 const MAX_SUBJECT = 200;
 const MAX_MESSAGE = 5000;
@@ -40,15 +41,18 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { email, subject, message } = body;
+    const { name, email, subject, message } = body;
 
-    if (!email || !subject || !message) {
+    if (!name || !email || !subject || !message) {
       return NextResponse.json(
-        { error: "Missing required fields: email, subject, message" },
+        { error: "Missing required fields: name, email, subject, message" },
         { status: 400 },
       );
     }
 
+    if (typeof name !== "string" || name.length > MAX_NAME) {
+      return NextResponse.json({ error: "Invalid name" }, { status: 400 });
+    }
     if (typeof email !== "string" || email.length > MAX_EMAIL || !EMAIL_RE.test(email)) {
       return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
@@ -59,7 +63,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Message too long" }, { status: 400 });
     }
 
-    // Sanitize subject — strip newlines to prevent header injection
+    // Sanitize inputs — strip newlines to prevent header injection
+    const safeName = name.replace(/[\r\n]/g, "");
     const safeSubject = subject.replace(/[\r\n]/g, "");
 
     const { error } = await resend.emails.send({
@@ -67,7 +72,7 @@ export async function POST(req: Request) {
       to: CONTACT_EMAIL,
       replyTo: email,
       subject: `[Portfolio] ${safeSubject}`,
-      text: `From: ${email}\n\n${message}`,
+      text: `From: ${safeName} <${email}>\n\n${message}`,
     });
 
     if (error) {
