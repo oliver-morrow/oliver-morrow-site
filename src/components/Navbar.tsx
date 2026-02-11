@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Github, Linkedin, Mail, Search } from "lucide-react";
+import { Github, Linkedin, Mail, Menu, Search, X } from "lucide-react";
 import SpotlightSearch from "./SpotlightSearch";
 import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,7 @@ function formatUptime(ms: number): string {
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const uptimeRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -95,6 +96,15 @@ export default function Navbar() {
             ))}
           </nav>
 
+          {/* Mobile menu toggle */}
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className="md:hidden p-1.5 rounded text-text-muted hover:text-accent transition-colors duration-200"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+
           {/* Right — uptime + socials */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-1.5 font-mono text-xs text-text-muted">
@@ -142,6 +152,28 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      {/* Mobile nav panel */}
+      {mobileOpen && (
+        <nav className="md:hidden border-t border-border bg-bg/95 backdrop-blur-md">
+          <div className="mx-auto max-w-6xl px-4 py-3 flex flex-col gap-1">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  "px-3 py-2 rounded font-mono text-xs uppercase tracking-widest",
+                  "text-text-muted hover:text-accent hover:bg-accent-glow",
+                  "transition-all duration-200"
+                )}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+      )}
+
       <SpotlightSearch />
     </header>
   );
