@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Github, Linkedin, Mail, Menu, Search, X } from "lucide-react";
 import SpotlightSearch from "./SpotlightSearch";
 import { siteConfig } from "@/data/portfolio";
@@ -23,23 +23,9 @@ const socialLinks = [
   { icon: Mail, href: `mailto:${socials.email}`, label: "Email" },
 ];
 
-const BUILD_TIME = Number(process.env.NEXT_PUBLIC_BUILD_TIME) || Date.now();
-
-function formatUptime(ms: number): string {
-  const s = Math.floor(ms / 1000);
-  const d = Math.floor(s / 86400);
-  const h = Math.floor((s % 86400) / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  if (d > 0) return `${d}d ${h}h ${m}m`;
-  if (h > 0) return `${h}h ${m}m ${sec}s`;
-  return `${m}m ${sec}s`;
-}
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const uptimeRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -47,17 +33,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Update uptime imperatively — avoids re-rendering the entire navbar every second
-  useEffect(() => {
-    const tick = () => {
-      if (uptimeRef.current) {
-        uptimeRef.current.textContent = formatUptime(Date.now() - BUILD_TIME);
-      }
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
 
   return (
     <header
@@ -105,13 +80,8 @@ export default function Navbar() {
             {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
 
-          {/* Right — uptime + socials */}
+          {/* Right — search + socials */}
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 font-mono text-xs text-text-muted">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-dot" />
-              <span ref={uptimeRef} />
-            </div>
-
             <button
               onClick={() =>
                 document.dispatchEvent(new Event("spotlight:open"))
