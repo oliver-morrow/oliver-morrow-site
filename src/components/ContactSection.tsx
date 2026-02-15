@@ -186,7 +186,7 @@ export default function ContactSection() {
       </SectionReveal>
 
       <footer className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-text-muted">
           {/* Left — Copyright */}
           <p>
             &copy; {new Date().getFullYear()} {siteConfig.profile.name}
@@ -210,7 +210,7 @@ export default function ContactSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className="text-zinc-600 hover:text-accent transition-colors duration-150"
+                className="text-text-muted hover:text-accent transition-colors duration-150"
               >
                 <social.icon className="h-3.5 w-3.5" />
               </a>
