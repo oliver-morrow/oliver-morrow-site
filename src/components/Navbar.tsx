@@ -62,7 +62,7 @@ export default function Navbar() {
                 href={link.href}
                 className={cn(
                   "px-3 py-1.5 rounded font-mono text-xs uppercase tracking-widest",
-                  "text-text-muted hover:text-accent hover:bg-accent-glow",
+                  "text-white hover:text-accent hover:bg-accent-glow",
                   "transition-all duration-200"
                 )}
               >
@@ -74,7 +74,7 @@ export default function Navbar() {
           {/* Mobile menu toggle */}
           <button
             onClick={() => setMobileOpen((v) => !v)}
-            className="md:hidden p-1.5 rounded text-text-muted hover:text-accent transition-colors duration-200"
+            className="md:hidden p-1.5 rounded text-white hover:text-accent transition-colors duration-200"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -89,7 +89,7 @@ export default function Navbar() {
               className={cn(
                 "hidden sm:flex items-center gap-1.5 px-2 py-1 rounded",
                 "border border-border hover:border-border-hover",
-                "font-mono text-[10px] text-text-muted hover:text-accent",
+                "font-mono text-[10px] text-white hover:text-accent",
                 "transition-all duration-200",
               )}
               aria-label="Search (Cmd+K)"
@@ -110,7 +110,7 @@ export default function Navbar() {
                   rel="noopener noreferrer"
                   aria-label={social.label}
                   className={cn(
-                    "p-1.5 rounded text-text-muted",
+                    "p-1.5 rounded text-white",
                     "hover:text-accent hover:bg-accent-glow",
                     "transition-all duration-200"
                   )}
@@ -133,7 +133,7 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className={cn(
                   "px-3 py-2 rounded font-mono text-xs uppercase tracking-widest",
-                  "text-text-muted hover:text-accent hover:bg-accent-glow",
+                  "text-white hover:text-accent hover:bg-accent-glow",
                   "transition-all duration-200"
                 )}
               >
