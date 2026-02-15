@@ -506,19 +506,19 @@ export default function HeroSection() {
             transition={{ delay: 1.0, duration: 0.6 }}
           >
             <div>
-              <span className="text-zinc-500">{"EDUCATION   "}</span>
+              <span className="text-zinc-400">{"EDUCATION   "}</span>
               <span className="text-cyan-500/90">{"QUEEN'S UNIVERSITY // COMPUTER ENGINEERING"}</span>
             </div>
             <div>
-              <span className="text-zinc-500">{"CURRENT     "}</span>
+              <span className="text-zinc-400">{"CURRENT     "}</span>
               <span className="text-cyan-500/90">{"DIGITAL DATA ENGINEERING // SANOFI"}</span>
             </div>
             <div>
-              <span className="text-zinc-500">{"LOCATION    "}</span>
+              <span className="text-zinc-400">{"LOCATION    "}</span>
               <span className="text-cyan-500/90">{"TORONTO, CANADA"}</span>
             </div>
             <div>
-              <span className="text-zinc-500">{"CORE TECH   "}</span>
+              <span className="text-zinc-400">{"CORE TECH   "}</span>
               <span className="text-cyan-500/90">{"SNOWFLAKE / DBT / SQL / PYTHON"}</span>
             </div>
           </motion.div>

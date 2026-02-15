@@ -19,7 +19,7 @@
   /* Text */
   --color-text-primary: #ffffff;
   --color-text-body: #a1a1aa;   /* zinc-400 */
-  --color-text-muted: #71717a;  /* zinc-500 */
+  --color-text-muted: #a1a1aa;  /* zinc-400 */
 
   /* Borders */
   --color-border: #27272a;      /* zinc-800 */

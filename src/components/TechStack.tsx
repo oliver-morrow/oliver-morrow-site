@@ -64,7 +64,7 @@ export default function TechStack() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {skills.map((category) => (
             <div key={category.label}>
-              <p className="text-zinc-500 font-mono text-sm uppercase mb-4">
+              <p className="text-zinc-400 font-mono text-sm uppercase mb-4">
                 {category.label}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -96,7 +96,7 @@ export default function TechStack() {
                 {levelLabel[activeSkill.level]} {levelBar[activeSkill.level]}
               </p>
               {activeSkill.usedAt.length > 0 && (
-                <p className="text-[10px] font-mono text-zinc-500 mt-1">
+                <p className="text-[10px] font-mono text-zinc-400 mt-1">
                   Used at: {activeSkill.usedAt.join(", ")}
                 </p>
               )}
