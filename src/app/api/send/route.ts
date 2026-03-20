@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export const runtime = "edge";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "me@olivermorrow.ca";
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_NAME = 100;
@@ -31,6 +31,9 @@ export async function POST(req: Request) {
   try {
     if (!RESEND_API_KEY) {
       return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+    }
+    if (!CONTACT_EMAIL) {
+      return NextResponse.json({ error: "Contact recipient not configured" }, { status: 500 });
     }
 
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
