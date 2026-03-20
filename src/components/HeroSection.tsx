@@ -109,7 +109,7 @@ export default function HeroSection() {
   }, []);
 
   const [gridSize, setGridSize] = useState(128);
-  const gridTier = gridSize >= 256 ? "UNLEASHED"
+  const gridTier = gridSize >= 256 ? "HIGH"
     : gridSize >= 128 ? "STANDARD"
     : "THERMAL_SAFE";
   const downgradedRef = useRef(false);
