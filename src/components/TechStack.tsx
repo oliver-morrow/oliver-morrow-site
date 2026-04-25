@@ -60,6 +60,10 @@ export default function TechStack() {
         className="relative mx-auto max-w-6xl px-4 sm:px-6 py-20"
       >
         <SectionHeader title="Technologies" />
+        <p className="-mt-4 mb-10 max-w-3xl text-sm leading-relaxed text-text-body sm:text-base">
+          The broader toolchain behind the work above, spanning data engineering, infrastructure,
+          automation, and systems work.
+        </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {skills.map((category) => (

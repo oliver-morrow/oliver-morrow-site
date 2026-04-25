@@ -3,6 +3,7 @@ export interface SiteConfig {
     name: string;
     title: string;
     bio: string;
+    coreStack: string[];
     socials: {
       github: string;
       linkedin: string;
@@ -33,6 +34,22 @@ export interface Project {
     demo?: string;
   };
   featured: boolean;
+}
+
+export interface CaseStudy {
+  id: string;
+  title: string;
+  organization: string;
+  period: { start: string; end: string };
+  summary: string;
+  problem: string;
+  ownership: string[];
+  approach: string[];
+  impact: string[];
+  tech: string[];
+  tags: string[];
+  featured: boolean;
+  confidentialityNote?: string;
 }
 
 export interface Education {

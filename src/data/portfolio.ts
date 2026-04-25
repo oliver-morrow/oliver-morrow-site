@@ -1,10 +1,18 @@
-import type { Experience, Project, SiteConfig, Education, SkillCategory } from "../types";
+import type {
+  Experience,
+  Project,
+  SiteConfig,
+  Education,
+  SkillCategory,
+  CaseStudy,
+} from "../types";
 
 export const siteConfig: SiteConfig = {
   profile: {
     name: "Oliver Morrow",
-    title: "Computer, Data & Systems Engineering",
-    bio: "Computer Engineering student building data platforms, embedded systems, and everything in between.",
+    title: "Data Platforms, Agents & Systems Engineering",
+    bio: "I build production data and agent systems, from internal tooling and automation to hosted platforms people actually use.",
+    coreStack: ["Snowflake", "dbt", "Airflow", "Python", "SQL", "AWS", "MCP"],
     socials: {
       github: "https://github.com/oliver-morrow",
       linkedin: "https://linkedin.com/in/oliver-morrow",
@@ -206,6 +214,71 @@ export const projects: Project[] = [
     technologies: ["C", "Algorithms", "Memory Management"],
     links: {},
     featured: false,
+  },
+];
+
+export const caseStudies: CaseStudy[] = [
+  {
+    id: "sanofi-snowflake-agents",
+    title: "Snowflake Cortex Agent Architecture",
+    organization: "Sanofi",
+    period: { start: "Fall 2025", end: "Present" },
+    summary:
+      "Built and owned core parts of a production Snowflake Cortex agent experience that helped internal users access project, portfolio, and application information without manually assembling reports.",
+    problem:
+      "Important portfolio and product information lived across financial and project/portfolio management systems, which meant employees often had to build reports manually just to understand project status or take action.",
+    ownership: [
+      "Owned the write-capable agent integrations and helped design and implement the main agent experience.",
+      "Built core agent components including procedures, functions, semantic models, RAG workflows, and search services.",
+      "Worked across data modeling, reliability, and production-readiness concerns rather than stopping at prototype-level functionality.",
+    ],
+    approach: [
+      "Used Snowflake Cortex, dbt, and Airflow to connect governed enterprise data with agent workflows that could answer questions and handle write-capable actions.",
+      "Optimized queries and recovery behavior so the main agent could handle prompts touching years of data while remaining fast and resilient to unexpected inputs.",
+      "Tuned guardrails for the writeback agent to balance safety and speed, especially around preventing bad or malicious updates without making the experience unusably slow.",
+    ],
+    impact: [
+      "Shipped to production on an internal Sanofi platform rather than staying as a demo or sandbox workflow.",
+      "Reduced the need for manual report-building across enterprise systems just to get insight into project and product information.",
+      "Established a foundation for further agent work by turning semantic views and agent patterns into something repeatable and operationally usable.",
+      "Proved that a small team inside an enterprise environment could iterate quickly on real production agent capabilities.",
+    ],
+    tech: ["Snowflake", "Cortex", "dbt", "Airflow", "SQL", "Enterprise Integrations"],
+    tags: ["Agents", "Production", "Semantic Layer", "Writeback"],
+    featured: true,
+    confidentialityNote:
+      "Internal product names, system details, and rollout specifics are intentionally abstracted.",
+  },
+  {
+    id: "sanofi-dbt-forecasting",
+    title: "dbt Pipeline Automation for Budgeting & Forecasting",
+    organization: "Sanofi",
+    period: { start: "Fall 2025", end: "Present" },
+    summary:
+      "Worked on a dbt-driven data pipeline powering an internal planning and forecasting product, with a strong emphasis on CI/CD, testing, and business-logic automation.",
+    problem:
+      "Forecasting workflows are high-stakes and organization-wide, and they become painful quickly when business logic changes are slow to intake, hard to test, or messy to deploy.",
+    ownership: [
+      "Worked as a data engineer on the pipeline and surrounding engineering workflow for the forecasting product.",
+      "Contributed directly to the dbt-based transformation layer and the delivery discipline around testing and deploying changes through GitHub.",
+      "Helped improve how new business logic was ingested, structured, and turned into implementation work.",
+    ],
+    approach: [
+      "Used dbt and orchestration workflows to support a product that let stakeholders responsible for budgets and forecasts report spend and anticipated spend during planning cycles.",
+      "Relied heavily on GitHub CI/CD, branch protection, testing in pull requests, and structured deployment workflows to keep changes safe and reviewable.",
+      "Used automation and subagents to intake new business logic, act on tickets, and generate pull requests once the workflow was mature enough to standardize.",
+    ],
+    impact: [
+      "Supported an internal forecasting workflow that mattered across the organization, not just to a single team.",
+      "Made it easier to incorporate changing business logic without relying entirely on manual engineering intake.",
+      "Improved repository structure and delivery hygiene, making the codebase cleaner and the workflow easier to maintain.",
+      "Helped sustain a fast shipping cadence around a business-critical quarter-end workflow.",
+    ],
+    tech: ["dbt", "Airflow", "GitHub Actions", "SQL", "Automation", "Subagents"],
+    tags: ["dbt", "Forecasting", "CI/CD", "Automation"],
+    featured: true,
+    confidentialityNote:
+      "Product details, financial context, and internal workflow specifics are intentionally abstracted.",
   },
 ];
 

@@ -511,7 +511,7 @@ export default function HeroSection() {
             </div>
             <div>
               <span className="text-zinc-400">{"CURRENT     "}</span>
-              <span className="text-cyan-500/90">{"DIGITAL DATA ENGINEERING // SANOFI"}</span>
+              <span className="text-cyan-500/90">{"AI COE // SANOFI"}</span>
             </div>
             <div>
               <span className="text-zinc-400">{"LOCATION    "}</span>
@@ -519,7 +519,7 @@ export default function HeroSection() {
             </div>
             <div>
               <span className="text-zinc-400">{"CORE TECH   "}</span>
-              <span className="text-cyan-500/90">{"SNOWFLAKE / DBT / SQL / PYTHON"}</span>
+              <span className="text-cyan-500/90">{"SNOWFLAKE / DBT / AIRFLOW / AWS"}</span>
             </div>
           </motion.div>
 
