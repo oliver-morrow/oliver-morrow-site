@@ -224,24 +224,24 @@ export const caseStudies: CaseStudy[] = [
     organization: "Sanofi",
     period: { start: "Fall 2025", end: "Present" },
     summary:
-      "Built and owned core parts of a production Snowflake Cortex agent experience that helped internal users access project, portfolio, and application information without manually assembling reports.",
+      "Built and owned core parts of a production internal agent experience that helped users access project, portfolio, and application information without manually assembling reports.",
     problem:
       "Important portfolio and product information lived across financial and project/portfolio management systems, which meant employees often had to build reports manually just to understand project status or take action.",
     ownership: [
-      "Owned the write-capable agent integrations and helped design and implement the main agent experience.",
-      "Built core agent components including procedures, functions, semantic models, RAG workflows, and search services.",
+      "Owned agent integrations with internal systems and helped design and implement the main agent experience.",
+      "Built core agent infrastructure, retrieval workflows, and supporting data models.",
       "Worked across data modeling, reliability, and production-readiness concerns rather than stopping at prototype-level functionality.",
     ],
     approach: [
-      "Used Snowflake Cortex, dbt, and Airflow to connect governed enterprise data with agent workflows that could answer questions and handle write-capable actions.",
+      "Used Snowflake Cortex, dbt, and Airflow to connect governed enterprise data with agent workflows that could answer questions and support operational workflows.",
       "Optimized queries and recovery behavior so the main agent could handle prompts touching years of data while remaining fast and resilient to unexpected inputs.",
-      "Tuned guardrails for the writeback agent to balance safety and speed, especially around preventing bad or malicious updates without making the experience unusably slow.",
+      "Tuned guardrails for governed updates to balance safety, accuracy, and responsiveness without making the experience unusably slow.",
     ],
     impact: [
-      "Shipped to production on an internal Sanofi platform rather than staying as a demo or sandbox workflow.",
+      "Moved from prototype work into a production internal environment rather than staying as a demo or sandbox workflow.",
       "Reduced the need for manual report-building across enterprise systems just to get insight into project and product information.",
       "Established a foundation for further agent work by turning semantic views and agent patterns into something repeatable and operationally usable.",
-      "Proved that a small team inside an enterprise environment could iterate quickly on real production agent capabilities.",
+      "Showed that the team could iterate quickly while working within enterprise constraints.",
     ],
     tech: ["Snowflake", "Cortex", "dbt", "Airflow", "SQL", "Enterprise Integrations"],
     tags: ["Agents", "Production", "Semantic Layer", "Writeback"],
@@ -255,7 +255,7 @@ export const caseStudies: CaseStudy[] = [
     organization: "Sanofi",
     period: { start: "Fall 2025", end: "Present" },
     summary:
-      "Worked on a dbt-driven data pipeline powering an internal planning and forecasting product, with a strong emphasis on CI/CD, testing, and business-logic automation.",
+      "Worked on a dbt-driven data pipeline powering an internal planning workflow, with a strong emphasis on CI/CD, testing, and business-logic automation.",
     problem:
       "Forecasting workflows are high-stakes and organization-wide, and they become painful quickly when business logic changes are slow to intake, hard to test, or messy to deploy.",
     ownership: [
@@ -264,9 +264,9 @@ export const caseStudies: CaseStudy[] = [
       "Helped improve how new business logic was ingested, structured, and turned into implementation work.",
     ],
     approach: [
-      "Used dbt and orchestration workflows to support a product that let stakeholders responsible for budgets and forecasts report spend and anticipated spend during planning cycles.",
+      "Used dbt and orchestration workflows to support a product where stakeholders maintained planning inputs and projected spend during key planning cycles.",
       "Relied heavily on GitHub CI/CD, branch protection, testing in pull requests, and structured deployment workflows to keep changes safe and reviewable.",
-      "Used automation and subagents to intake new business logic, act on tickets, and generate pull requests once the workflow was mature enough to standardize.",
+      "Used automation and subagents to accelerate business-logic intake, implementation, and code review workflows once the process was mature enough to standardize.",
     ],
     impact: [
       "Supported an internal forecasting workflow that mattered across the organization, not just to a single team.",
