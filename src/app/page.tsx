@@ -1,8 +1,9 @@
 import HeroSection from "@/components/HeroSection";
+import CoreStackBand from "@/components/CoreStackBand";
 import TechStack from "@/components/TechStack";
 import ExperienceSection from "@/components/ExperienceSection";
-import EducationSection from "@/components/EducationSection";
-import VolunteerSection from "@/components/VolunteerSection";
+import CaseStudiesSection from "@/components/CaseStudiesSection";
+import BackgroundSection from "@/components/BackgroundSection";
 import ProjectGrid from "@/components/ProjectGrid";
 import ContactSection from "@/components/ContactSection";
 
@@ -10,11 +11,12 @@ export default function Home() {
   return (
     <>
       <HeroSection />
-      <TechStack />
-      <ExperienceSection />
-      <EducationSection />
-      <VolunteerSection />
+      <CoreStackBand />
+      <CaseStudiesSection />
       <ProjectGrid />
+      <ExperienceSection />
+      <TechStack />
+      <BackgroundSection />
       <ContactSection />
     </>
   );

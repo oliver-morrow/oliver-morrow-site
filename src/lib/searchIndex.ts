@@ -4,9 +4,11 @@ import {
   projects,
   education,
   skills,
+  caseStudies,
 } from "@/data/portfolio";
 
 export type SearchCategory =
+  | "caseStudy"
   | "experience"
   | "volunteer"
   | "project"
@@ -32,7 +34,7 @@ function buildSearchIndex(): SearchItem[] {
       title: exp.role,
       subtitle: exp.company,
       category: "experience",
-      href: "#experience",
+      href: "/#experience",
       keywords: [
         exp.role,
         exp.company,
@@ -45,13 +47,36 @@ function buildSearchIndex(): SearchItem[] {
     });
   }
 
+  for (const study of caseStudies) {
+    items.push({
+      id: `case-${study.id}`,
+      title: study.title,
+      subtitle: study.organization,
+      category: "caseStudy",
+      href: `/case-studies#${study.id}`,
+      keywords: [
+        study.title,
+        study.organization,
+        study.summary,
+        study.problem,
+        ...study.ownership,
+        ...study.approach,
+        ...study.impact,
+        ...study.tech,
+        ...study.tags,
+      ]
+        .join(" ")
+        .toLowerCase(),
+    });
+  }
+
   for (const vol of volunteer) {
     items.push({
       id: `vol-${vol.id}`,
       title: vol.role,
       subtitle: vol.company,
       category: "volunteer",
-      href: "#volunteer",
+      href: "/#volunteer",
       keywords: [
         vol.role,
         vol.company,
@@ -70,7 +95,7 @@ function buildSearchIndex(): SearchItem[] {
       title: proj.title,
       subtitle: proj.tagline,
       category: "project",
-      href: "#projects",
+      href: "/#projects",
       keywords: [
         proj.title,
         proj.tagline,
@@ -89,7 +114,7 @@ function buildSearchIndex(): SearchItem[] {
       title: edu.degree,
       subtitle: edu.school,
       category: "education",
-      href: "#education",
+      href: "/#education",
       keywords: [edu.degree, edu.school, edu.year, ...edu.courses]
         .join(" ")
         .toLowerCase(),
@@ -103,7 +128,7 @@ function buildSearchIndex(): SearchItem[] {
         title: skill.name,
         subtitle: cat.label,
         category: "skill",
-        href: "#skills",
+        href: "/#skills",
         keywords: [skill.name, cat.label, ...skill.usedAt]
           .join(" ")
           .toLowerCase(),
@@ -112,12 +137,12 @@ function buildSearchIndex(): SearchItem[] {
   }
 
   const navSections = [
-    { title: "Experience", href: "#experience" },
-    { title: "Education", href: "#education" },
-    { title: "Volunteer", href: "#volunteer" },
-    { title: "Projects", href: "#projects" },
-    { title: "Contact", href: "#contact" },
-    { title: "Technologies", href: "#skills" },
+    { title: "Case Studies", href: "/case-studies" },
+    { title: "Projects", href: "/#projects" },
+    { title: "Experience", href: "/#experience" },
+    { title: "Stack", href: "/#skills" },
+    { title: "Contact", href: "/#contact" },
+    { title: "Writing", href: "https://blog.olivermorrow.com" },
   ];
   for (const nav of navSections) {
     items.push({

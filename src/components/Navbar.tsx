@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Github, Linkedin, Mail, Menu, Search, X } from "lucide-react";
 import SpotlightSearch from "./SpotlightSearch";
@@ -7,12 +8,12 @@ import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { label: "EXPERIENCE", href: "#experience" },
-  { label: "EDUCATION", href: "#education" },
-  { label: "VOLUNTEER", href: "#volunteer" },
-  { label: "PROJECTS", href: "#projects" },
+  { label: "CASE STUDIES", href: "/case-studies" },
+  { label: "PROJECTS", href: "/#projects" },
+  { label: "EXPERIENCE", href: "/#experience" },
+  { label: "STACK", href: "/#skills" },
   { label: "WRITING", href: "https://blog.olivermorrow.com" },
-  { label: "CONTACT", href: "#contact" },
+  { label: "CONTACT", href: "/#contact" },
 ];
 
 const { socials } = siteConfig.profile;
@@ -47,27 +48,41 @@ export default function Navbar() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex h-12 items-center justify-between">
           {/* Left — system identifier */}
-          <a
-            href="#"
+          <Link
+            href="/"
             className="font-mono text-sm font-semibold text-text-primary hover:text-accent transition-colors"
           >
             olivermorrow
-          </a>
+          </Link>
 
           {/* Center — nav links */}
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-3 py-1.5 rounded font-mono text-xs uppercase tracking-widest",
-                  "text-white hover:text-accent hover:bg-accent-glow",
-                  "transition-all duration-200"
-                )}
-              >
-                {link.label}
-              </a>
+              link.href.startsWith("http") ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "px-3 py-1.5 rounded font-mono text-xs uppercase tracking-widest",
+                    "text-white hover:text-accent hover:bg-accent-glow",
+                    "transition-all duration-200"
+                  )}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "px-3 py-1.5 rounded font-mono text-xs uppercase tracking-widest",
+                    "text-white hover:text-accent hover:bg-accent-glow",
+                    "transition-all duration-200"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
           </nav>
 
@@ -127,18 +142,33 @@ export default function Navbar() {
         <nav className="md:hidden border-t border-border bg-bg/95 backdrop-blur-md">
           <div className="mx-auto max-w-6xl px-4 py-3 flex flex-col gap-1">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "px-3 py-2 rounded font-mono text-xs uppercase tracking-widest",
-                  "text-white hover:text-accent hover:bg-accent-glow",
-                  "transition-all duration-200"
-                )}
-              >
-                {link.label}
-              </a>
+              link.href.startsWith("http") ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "px-3 py-2 rounded font-mono text-xs uppercase tracking-widest",
+                    "text-white hover:text-accent hover:bg-accent-glow",
+                    "transition-all duration-200"
+                  )}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "px-3 py-2 rounded font-mono text-xs uppercase tracking-widest",
+                    "text-white hover:text-accent hover:bg-accent-glow",
+                    "transition-all duration-200"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
           </div>
         </nav>
