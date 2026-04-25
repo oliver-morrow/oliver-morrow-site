@@ -69,29 +69,32 @@ export default function ProjectGrid() {
               }
               expandedContent={
                 <div>
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-text-primary">
-                        {project.title}
-                      </h3>
-                      <p className="mt-0.5 font-mono text-xs uppercase tracking-widest text-text-muted">
-                        {project.tagline}
-                      </p>
-                    </div>
-
-                    {project.links.demo && (
-                      <a
-                        href={project.links.demo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`View ${project.title}`}
-                        className="shrink-0 p-1 text-text-muted hover:text-accent transition-colors duration-200"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ArrowUpRight className="h-4 w-4" />
-                      </a>
-                    )}
+                  <div>
+                    <h3 className="text-lg font-bold text-text-primary">
+                      {project.title}
+                    </h3>
+                    <p className="mt-0.5 font-mono text-xs uppercase tracking-widest text-text-muted">
+                      {project.tagline}
+                    </p>
                   </div>
+
+                  {project.links.demo && (
+                    <a
+                      href={project.links.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`View ${project.title}`}
+                      className={cn(
+                        "mt-3 inline-flex items-center gap-1.5 rounded border border-border px-2.5 py-1.5",
+                        "font-mono text-[10px] uppercase tracking-widest text-text-muted",
+                        "transition-colors duration-200 hover:border-border-hover hover:text-accent",
+                      )}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Open Project
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </a>
+                  )}
 
                   <p className="mt-3 text-sm text-text-body leading-relaxed">
                     {project.description}
