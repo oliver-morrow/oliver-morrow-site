@@ -39,7 +39,7 @@ export const education: Education[] = [
 export const experience: Experience[] = [
   {
     id: "sanofi-2025",
-    role: "Data Engineer Co-op",
+    role: "Data & AI Engineer Co-op",
     company: "Sanofi",
     period: { start: "Sep 2025", end: "Present" },
     description: "Developing Semantic Models using Snowflake Cortex and bridging complex SQL logic with Python orchestration. Managing automated dbt pipelines and exploring Agentic workflows with Snowflake Cortex.",
