@@ -29,13 +29,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" style={{ backgroundColor: "#000000" }}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ backgroundColor: "#000000", color: "#a1a1aa" }}
       >
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-black">
           <Navbar />
-          <main className="pt-12">{children}</main>
+          <main className="min-h-screen bg-black pt-12">{children}</main>
         </div>
       </body>
     </html>

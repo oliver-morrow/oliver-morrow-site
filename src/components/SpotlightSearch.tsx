@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -11,6 +12,7 @@ import {
   Heart,
   Cpu,
   Compass,
+  FileStack,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
@@ -26,6 +28,7 @@ const categoryMeta: Record<
   { label: string; icon: typeof Briefcase }
 > = {
   navigation: { label: "GO TO", icon: Compass },
+  caseStudy: { label: "CASE STUDIES", icon: FileStack },
   experience: { label: "EXPERIENCE", icon: Briefcase },
   project: { label: "PROJECTS", icon: FolderGit2 },
   education: { label: "EDUCATION", icon: GraduationCap },
@@ -50,6 +53,8 @@ const dialogVariants = {
 };
 
 export default function SpotlightSearch() {
+  const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -126,13 +131,38 @@ export default function SpotlightSearch() {
       setOpen(false);
       setQuery("");
       requestAnimationFrame(() => {
-        document.querySelector(item.href)?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        if (item.href.startsWith("http")) {
+          window.location.href = item.href;
+          return;
+        }
+
+        if (item.href.startsWith("/#")) {
+          const target = item.href.slice(1);
+          if (pathname === "/") {
+            document.querySelector(target)?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+            window.history.replaceState(null, "", item.href);
+            return;
+          }
+
+          router.push(item.href);
+          return;
+        }
+
+        if (item.href.startsWith("#")) {
+          document.querySelector(item.href)?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+          return;
+        }
+
+        router.push(item.href);
       });
     },
-    [],
+    [pathname, router],
   );
 
   const handleInputKeyDown = useCallback(
@@ -200,7 +230,7 @@ export default function SpotlightSearch() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleInputKeyDown}
-                  placeholder="Search experience, projects, skills..."
+                  placeholder="Search case studies, experience, projects, skills..."
                   className={cn(
                     "w-full py-3 bg-transparent outline-none",
                     "text-sm text-text-primary placeholder:text-text-muted",
@@ -241,7 +271,11 @@ export default function SpotlightSearch() {
                             key={item.id}
                             data-index={globalIdx}
                             onClick={() => handleSelect(item)}
-                            onMouseEnter={() => setSelectedIndex(globalIdx)}
+                            onPointerMove={() => {
+                              if (selectedIndex !== globalIdx) {
+                                setSelectedIndex(globalIdx);
+                              }
+                            }}
                             className={cn(
                               "w-full text-left px-4 py-2 flex items-center gap-3",
                               "transition-colors duration-100",

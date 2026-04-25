@@ -68,6 +68,11 @@ section[id] {
 }
 
 /* ── Card noise overlay ──────────────────────────────────────── */
+.card-noise {
+  position: relative;
+  isolation: isolate;
+}
+
 .card-noise::before {
   content: "";
   position: absolute;
