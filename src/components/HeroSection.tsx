@@ -519,7 +519,7 @@ export default function HeroSection() {
             </div>
             <div>
               <span className="text-zinc-400">{"CORE TECH   "}</span>
-              <span className="text-cyan-500/90">{"SNOWFLAKE / DBT / AIRFLOW / AWS"}</span>
+              <span className="text-cyan-500/90">{"SNOWFLAKE / DBT / AIRFLOW / SQL / MCP"}</span>
             </div>
           </motion.div>
 
