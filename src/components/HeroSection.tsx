@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/data/portfolio";
@@ -60,6 +61,11 @@ const itemVariants = {
 };
 
 const { profile } = siteConfig;
+const heroLinks = [
+  { label: "Work", href: "/work", external: false },
+  { label: "About", href: "/about", external: false },
+  { label: "Notes", href: profile.socials.blog, external: true },
+] as const;
 
 /* ── Heap memory helper ────────────────────────────────────── */
 type PerfMemory = { usedJSHeapSize: number; jsHeapSizeLimit: number };
@@ -457,7 +463,10 @@ export default function HeroSection() {
 
   /* ── JSX ─────────────────────────────────────────────────── */
   return (
-    <section className="relative mx-auto max-w-6xl px-4 sm:px-6 min-h-[calc(100dvh-4rem)] flex flex-col justify-center">
+    <section
+      id="home"
+      className="relative mx-auto flex min-h-[calc(100dvh-4rem)] max-w-6xl flex-col justify-center px-4 sm:px-6"
+    >
       <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 py-12 sm:py-16 lg:py-20">
         {/* ── Left: Name + Title ─────────────────────────────── */}
         <motion.div
@@ -474,18 +483,52 @@ export default function HeroSection() {
           </motion.h1>
 
           <motion.p
-            className="mt-4 font-mono text-sm uppercase tracking-widest text-accent"
+            className="mt-4 max-w-2xl font-mono text-sm uppercase tracking-[0.25em] text-accent"
             variants={itemVariants}
           >
             {profile.title}
           </motion.p>
 
           <motion.p
-            className="mt-4 text-lg text-text-body leading-relaxed max-w-md"
+            className="mt-5 max-w-2xl text-lg leading-relaxed text-text-body sm:text-xl"
             variants={itemVariants}
           >
             {profile.bio}
           </motion.p>
+
+          <motion.p
+            className="mt-4 max-w-2xl text-sm leading-relaxed text-text-muted sm:text-base"
+            variants={itemVariants}
+          >
+            Mostly data systems, internal tools, and side projects.
+          </motion.p>
+
+          <motion.div
+            className="mt-8 flex flex-wrap gap-3"
+            variants={itemVariants}
+          >
+            {heroLinks.map((link) =>
+              link.external ? (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border border-border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.25em] text-text-primary transition-colors duration-200 hover:border-border-hover hover:text-accent"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="rounded-full border border-border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.25em] text-text-primary transition-colors duration-200 hover:border-border-hover hover:text-accent"
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
+          </motion.div>
 
           <motion.div
             className="mt-8 h-px max-w-xs bg-border"
@@ -506,16 +549,16 @@ export default function HeroSection() {
             transition={{ delay: 1.0, duration: 0.6 }}
           >
             <div>
-              <span className="text-zinc-400">{"EDUCATION   "}</span>
-              <span className="text-cyan-500/90">{"QUEEN'S UNIVERSITY // COMPUTER ENGINEERING"}</span>
+              <span className="text-zinc-400">{"RIGHT NOW   "}</span>
+              <span className="text-cyan-500/90">{profile.status.toUpperCase()}</span>
             </div>
             <div>
-              <span className="text-zinc-400">{"CURRENT     "}</span>
-              <span className="text-cyan-500/90">{"AI COE // SANOFI"}</span>
+              <span className="text-zinc-400">{"BASE        "}</span>
+              <span className="text-cyan-500/90">{profile.location.toUpperCase()}</span>
             </div>
             <div>
-              <span className="text-zinc-400">{"LOCATION    "}</span>
-              <span className="text-cyan-500/90">{"TORONTO, CANADA"}</span>
+              <span className="text-zinc-400">{"INTO        "}</span>
+              <span className="text-cyan-500/90">{"DATA SYSTEMS / INTERFACES / HOMELAB"}</span>
             </div>
             <div>
               <span className="text-zinc-400">{"CORE TECH   "}</span>
