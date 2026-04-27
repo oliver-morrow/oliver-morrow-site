@@ -10,14 +10,71 @@ import type {
 export const siteConfig: SiteConfig = {
   profile: {
     name: "Oliver Morrow",
-    title: "Data, AI & Systems Engineering",
-    bio: "I build production data platforms, agent workflows, and systems tooling with a focus on reliable internal products and infrastructure.",
+    title: "Computer engineering student working on data and AI systems",
+    bio: "I study computer engineering and spend most of my time working on data systems, internal AI tooling, and side projects.",
+    location: "Toronto / Kingston, Canada",
+    status: "Building at Sanofi's AI CoE and finishing engineering school",
     coreStack: ["Snowflake", "dbt", "Airflow", "Python", "SQL", "MCP"],
     socials: {
       github: "https://github.com/oliver-morrow",
       linkedin: "https://linkedin.com/in/oliver-morrow",
       email: "me@olivermorrow.ca",
+      blog: "https://blog.olivermorrow.com",
     },
+  },
+  frontDoor: {
+    intro:
+      "Work is here. Side projects are here too. Writing, when I have something to say.",
+    signalLinks: [
+      {
+        label: "WORK",
+        title: "Work",
+        description:
+          "Case studies, projects, and experience.",
+        href: "/work",
+      },
+      {
+        label: "ABOUT",
+        title: "About",
+        description:
+          "Background, interests, and the basics.",
+        href: "/about",
+      },
+      {
+        label: "NOTES",
+        title: "Writing",
+        description:
+          "Notes, links, and the occasional post.",
+        href: "https://blog.olivermorrow.com",
+        external: true,
+      },
+    ],
+    currentFocus: [
+      {
+        label: "WORK",
+        title: "Agent systems in production",
+        description:
+          "Mostly the boring parts: reliability, data models, and whether the thing is useful.",
+      },
+      {
+        label: "SIDE PROJECTS",
+        title: "Homelab and local tooling",
+        description:
+          "Clusters, scripts, and side projects that usually get out of hand.",
+      },
+      {
+        label: "WRITING",
+        title: "Writing more",
+        description:
+          "Still sparse, but I am trying to post more often.",
+      },
+    ],
+    principles: [
+      "I like systems that stay legible when they get bigger.",
+      "I care about interfaces almost as much as I care about infrastructure.",
+      "I learn best by building side projects that are a bit unnecessary.",
+      "Production constraints are usually more interesting than demos.",
+    ],
   },
 };
 

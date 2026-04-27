@@ -8,11 +8,9 @@ import { siteConfig } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { label: "CASE STUDIES", href: "/case-studies" },
-  { label: "PROJECTS", href: "/#projects" },
-  { label: "EXPERIENCE", href: "/#experience" },
-  { label: "STACK", href: "/#skills" },
-  { label: "WRITING", href: "https://blog.olivermorrow.com" },
+  { label: "WORK", href: "/work" },
+  { label: "ABOUT", href: "/about" },
+  { label: "NOTES", href: "https://blog.olivermorrow.com" },
   { label: "CONTACT", href: "/#contact" },
 ];
 
