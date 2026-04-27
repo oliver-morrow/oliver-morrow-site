@@ -19,8 +19,15 @@ export const metadata: Metadata = {
     default: "OLIVER MORROW",
   },
   description:
-    "Computer Engineering // Data Architecture // Hardware-Accelerated Interfaces.",
-  keywords: ["Data Engineer", "Systems Engineering", "Toronto", "Next.js", "WebGL"],
+    "A personal site about data systems, agent infrastructure, side projects, and the work behind them.",
+  keywords: [
+    "Oliver Morrow",
+    "Data Engineer",
+    "Systems Engineering",
+    "Agents",
+    "Toronto",
+    "Next.js",
+  ],
 };
 
 export default function RootLayout({

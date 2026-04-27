@@ -3,13 +3,36 @@ export interface SiteConfig {
     name: string;
     title: string;
     bio: string;
+    location: string;
+    status: string;
     coreStack: string[];
     socials: {
       github: string;
       linkedin: string;
       email: string;
+      blog: string;
     };
   };
+  frontDoor: {
+    intro: string;
+    signalLinks: SignalLink[];
+    currentFocus: FocusArea[];
+    principles: string[];
+  };
+}
+
+export interface SignalLink {
+  label: string;
+  title: string;
+  description: string;
+  href: string;
+  external?: boolean;
+}
+
+export interface FocusArea {
+  label: string;
+  title: string;
+  description: string;
 }
 
 export interface Experience {

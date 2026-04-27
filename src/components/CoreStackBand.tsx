@@ -19,8 +19,8 @@ export default function CoreStackBand() {
               Core Stack
             </p>
             <p className="mt-3 max-w-xl text-base leading-relaxed text-text-primary sm:text-lg">
-              Modern data and agent tooling, used in production. The point is not just the tools
-              themselves, but shipping real systems with them.
+              The tools I use most when building data systems, internal AI tooling, and the
+              infrastructure around them.
             </p>
           </div>
 
