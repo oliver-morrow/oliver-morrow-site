@@ -1,15 +1,19 @@
-import HeroSection from "@/components/HeroSection";
-import FrontDoorSection from "@/components/FrontDoorSection";
-import CurrentFocusSection from "@/components/CurrentFocusSection";
-import ContactSection from "@/components/ContactSection";
+import Introduction from "@/components/Introduction";
+import Previously from "@/components/Previously";
+import SelectedWork from "@/components/SelectedWork";
+import SiteFooter from "@/components/SiteFooter";
+import SiteHeader from "@/components/SiteHeader";
 
 export default function Home() {
   return (
-    <>
-      <HeroSection />
-      <FrontDoorSection />
-      <CurrentFocusSection />
-      <ContactSection />
-    </>
+    <div className="site-shell">
+      <SiteHeader />
+      <main>
+        <Introduction />
+        <SelectedWork />
+        <Previously />
+      </main>
+      <SiteFooter />
+    </div>
   );
 }
