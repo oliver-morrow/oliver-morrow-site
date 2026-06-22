@@ -151,6 +151,41 @@ main {
   font-size: 0.8rem;
 }
 
+.error-page {
+  display: grid;
+  gap: 1rem;
+  width: min(calc(100% - 2rem), var(--content-width));
+  min-height: 60vh;
+  align-content: center;
+  margin-inline: auto;
+}
+
+.error-page h2,
+.error-page p {
+  margin: 0;
+}
+
+.error-page p {
+  color: var(--muted);
+}
+
+.error-page button {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  color: var(--link);
+  background: transparent;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.error-page button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
 ::selection {
   background: #575044;
   color: var(--text);
