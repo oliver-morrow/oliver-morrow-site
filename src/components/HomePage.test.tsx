@@ -28,4 +28,11 @@ describe("home page", () => {
     expect(html).toContain(">LinkedIn</a>");
     expect(html).toContain(">Email</a>");
   });
+
+  it("exposes stable classes for the document layout", () => {
+    expect(html).toContain('class="site-shell"');
+    expect(html).toContain('class="introduction"');
+    expect(html).toContain('class="work-item"');
+    expect(html).toContain('class="site-footer"');
+  });
 });
