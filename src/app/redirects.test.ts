@@ -1,13 +1,21 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import nextConfig from "../../next.config";
 
-describe("legacy redirects", () => {
-  it("permanently redirects every removed content route", async () => {
-    const redirects = await nextConfig.redirects?.();
-    expect(redirects).toEqual([
-      { source: "/work", destination: "/#work", permanent: true },
-      { source: "/case-studies", destination: "/#work", permanent: true },
-      { source: "/about", destination: "/", permanent: true },
+describe("Cloudflare Pages deployment", () => {
+  it("exports static HTML with platform-native legacy redirects", () => {
+    expect(nextConfig.output).toBe("export");
+    expect(nextConfig.redirects).toBeUndefined();
+
+    const redirects = readFileSync(
+      fileURLToPath(new URL("../../public/_redirects", import.meta.url)),
+      "utf8",
+    );
+    expect(redirects.trim().split("\n")).toEqual([
+      "/work /#work 301",
+      "/case-studies /#work 301",
+      "/about / 301",
     ]);
   });
 });
