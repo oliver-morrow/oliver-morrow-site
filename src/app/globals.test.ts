@@ -29,6 +29,25 @@ describe("Quiet Ledger visual surface", () => {
     expect(paperTexture).not.toMatch(/<(?:path|circle)\b/);
   });
 
+  it("balances perceptible grain with compact vertical rhythm", () => {
+    expect(globalsCss).toMatch(/body::before\s*{[^}]*opacity:\s*0\.42/s);
+    expect(globalsCss).toMatch(
+      /main\s*{[^}]*padding-block:\s*clamp\(3\.5rem,\s*7vw,\s*5rem\)/s,
+    );
+    expect(globalsCss).toMatch(
+      /\.introduction\s*{[^}]*margin:\s*0 0 clamp\(3\.75rem,\s*8vw,\s*5\.5rem\)/s,
+    );
+    expect(globalsCss).toMatch(
+      /\.section\s*{[^}]*margin-top:\s*3\.25rem/s,
+    );
+    expect(globalsCss).toMatch(
+      /@media \(max-width:\s*36rem\)[\s\S]*main\s*{[^}]*padding-block:\s*3\.25rem 3\.75rem/s,
+    );
+    expect(globalsCss).toMatch(
+      /@media \(max-width:\s*36rem\)[\s\S]*\.introduction\s*{[^}]*margin-bottom:\s*3\.75rem/s,
+    );
+  });
+
   it("keeps the page as one continuous surface", () => {
     const shellRule = globalsCss.match(/\.site-shell\s*{([^}]*)}/s)?.[1] ?? "";
 
