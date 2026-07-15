@@ -2,10 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  images: { unoptimized: true },
-  env: {
-    NEXT_PUBLIC_COMMIT_SHA: process.env.CF_PAGES_COMMIT_SHA || "LOCAL_DEV",
-    NEXT_PUBLIC_BUILD_TIME: Date.now().toString(),
+  async redirects() {
+    return [
+      { source: "/work", destination: "/#work", permanent: true },
+      { source: "/case-studies", destination: "/#work", permanent: true },
+      { source: "/about", destination: "/", permanent: true },
+    ];
   },
 };
 
