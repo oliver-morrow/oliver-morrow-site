@@ -4,7 +4,7 @@ import { site } from "./site";
 describe("site content", () => {
   it("keeps the homepage deliberately small", () => {
     expect(site.introduction).toBe(
-      "Oliver Morrow is a computer engineering student at Queen's University, currently working on data and AI systems at Sanofi.",
+      "I'm a computer engineering student at Queen's University, currently working on data and AI systems at Sanofi.",
     );
     expect(site.selectedWork).toHaveLength(3);
     expect(site.selectedWork.map((item) => item.title)).toEqual([

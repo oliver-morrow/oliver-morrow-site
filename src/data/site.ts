@@ -19,7 +19,7 @@ export type PreviousItem = {
 export const site = {
   name: "Oliver Morrow",
   introduction:
-    "Oliver Morrow is a computer engineering student at Queen's University, currently working on data and AI systems at Sanofi.",
+    "I'm a computer engineering student at Queen's University, currently working on data and AI systems at Sanofi.",
   location: "Toronto / Kingston, Canada",
   links: [
     { label: "Writing", href: "https://blog.olivermorrow.com" },
