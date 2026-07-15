@@ -1,25 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <g fill="none" stroke="#f3ead8" stroke-linecap="round" stroke-width=".55" opacity=".055">
-    <path d="M7 18l8-1M31 9l5 2M55 24l11-2M89 13l7 1M118 29l9-3M151 11l13 2"/>
-    <path d="M18 48l6 1M43 39l10-2M72 57l5-1M101 43l12 2M137 52l8-3M169 35l6 1"/>
-    <path d="M9 79l11 2M37 70l7-3M64 91l9 1M96 74l6-2M126 88l13 2M161 71l8-1"/>
-    <path d="M22 113l9-2M51 103l5 2M78 122l12-1M111 108l7 3M143 119l10-2M174 101l5 1"/>
-    <path d="M8 148l7-2M35 137l12 1M69 156l6-3M99 141l9 2M131 160l8-1M159 143l14 3"/>
-    <path d="M20 181l10-1M53 172l8 2M86 185l5-2M116 174l11 1M148 187l7-3M177 169l6 2"/>
-  </g>
-  <g fill="none" stroke="#f3ead8" stroke-linecap="round" stroke-width=".35" opacity=".028">
-    <path d="M12 31l3 5M28 22l2-4M48 15l4 6M75 32l2-5M104 19l3 4M132 34l2-6M176 20l3 5"/>
-    <path d="M5 61l4 3M30 54l2 5M58 45l3-4M83 63l2 6M115 55l4-5M148 63l2 4M183 49l3-3"/>
-    <path d="M18 96l2 5M46 85l4 3M74 102l3-6M106 91l2 4M139 99l4-3M174 88l2 6"/>
-    <path d="M6 126l3-5M33 117l2 4M62 133l4-6M92 119l3 5M122 131l2-4M153 128l4 6M184 116l2-3"/>
-    <path d="M17 160l2 6M47 149l3-4M79 169l2 5M108 155l4-6M141 171l2 4M171 156l3-5"/>
-  </g>
-  <g fill="none" stroke="#090a08" stroke-linecap="round" stroke-width=".8" opacity=".07">
-    <path d="M17 6l9 2M68 7l6-1M111 6l12 3M160 6l8-2"/>
-    <path d="M3 42l10-2M38 31l7 2M79 40l11-3M123 39l6 1M157 45l12-2"/>
-    <path d="M23 67l5-2M52 77l13 3M91 66l8 1M134 73l10-3M178 65l7 2"/>
-    <path d="M4 105l8 2M40 96l11-1M82 109l7-3M119 98l12 2M164 110l9-1"/>
-    <path d="M15 136l12 3M57 128l6-2M94 134l10 1M138 140l7-3M181 132l5 2"/>
-    <path d="M4 176l9-3M39 183l12 2M72 176l8-1M126 183l11-3M164 178l9 2"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+  <defs>
+    <filter id="paper-grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".78"
+        numOctaves="3"
+        seed="23"
+        stitchTiles="stitch"
+      />
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope=".42" intercept=".29"/>
+        <feFuncG type="linear" slope=".4" intercept=".3"/>
+        <feFuncB type="linear" slope=".36" intercept=".32"/>
+        <feFuncA type="linear" slope=".34"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="320" height="320" filter="url(#paper-grain)"/>
 </svg>

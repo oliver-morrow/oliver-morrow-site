@@ -38,8 +38,9 @@ body::before {
   pointer-events: none;
   content: "";
   background-image: url("/textures/charcoal-paper.svg");
-  background-size: 192px 192px;
-  opacity: 0.72;
+  background-size: 320px 320px;
+  mix-blend-mode: soft-light;
+  opacity: 0.28;
 }
 
 a {

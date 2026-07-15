@@ -6,6 +6,12 @@ const globalsCss = readFileSync(
   fileURLToPath(new URL("./globals.css", import.meta.url)),
   "utf8",
 );
+const paperTexture = readFileSync(
+  fileURLToPath(
+    new URL("../../public/textures/charcoal-paper.svg", import.meta.url),
+  ),
+  "utf8",
+);
 
 describe("Quiet Ledger visual surface", () => {
   it("uses a local, pointer-inert paper texture", () => {
@@ -15,6 +21,12 @@ describe("Quiet Ledger visual surface", () => {
       /background-image:\s*url\("\/textures\/charcoal-paper\.svg"\)/,
     );
     expect(globalsCss).not.toMatch(/https?:\/\//);
+  });
+
+  it("uses continuous tonal grain rather than discrete sprinkle marks", () => {
+    expect(paperTexture).toMatch(/<feTurbulence\b/);
+    expect(paperTexture).toMatch(/stitchTiles="stitch"/);
+    expect(paperTexture).not.toMatch(/<(?:path|circle)\b/);
   });
 
   it("keeps the page as one continuous surface", () => {
