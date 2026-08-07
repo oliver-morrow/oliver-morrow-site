@@ -16,6 +16,7 @@ describe("Cloudflare Pages deployment", () => {
       "/work /#work 301",
       "/case-studies /#work 301",
       "/about / 301",
+      "/cyclicus /cyclicus/ 301",
     ]);
   });
 });
