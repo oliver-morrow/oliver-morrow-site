@@ -14,17 +14,25 @@ describe("site content", () => {
     );
   });
 
-  it("presents the four selected systems without performance claims", () => {
+  it("presents the selected systems without unsupported performance claims", () => {
     expect(site.selectedWork.map((item) => item.title)).toEqual([
       "Enterprise data access and agent workflows",
+      "PageScript",
       "Cyclicus",
       "Noteworthy",
       "Proxmox High-Availability Cluster",
     ]);
     expect(JSON.stringify(site.selectedWork)).not.toMatch(
-      /\b\d+(?:\.\d+)?%\b|annualized return|backtest return|uptime percentage/i,
+      /annualized return|backtest return|uptime percentage/i,
     );
     expect(site.selectedWork[0].todos).toEqual([]);
+    expect(site.selectedWork.find((item) => item.title === "PageScript")?.todos).toEqual([]);
+    expect(
+      site.selectedWork.find((item) => item.title === "PageScript")?.highlights.join(" "),
+    ).toContain("checked-in revenue-map fixture");
+    expect(
+      site.selectedWork.find((item) => item.title === "PageScript")?.highlights.join(" "),
+    ).toContain("64.08% fewer authored-artifact tokens");
     expect(site.selectedWork.find((item) => item.title === "Cyclicus")?.todos).toEqual([]);
     expect(site.selectedWork.find((item) => item.title === "Cyclicus")?.summary).toContain(
       "point-in-time market-sentiment research workbench",

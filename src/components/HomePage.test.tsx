@@ -30,6 +30,8 @@ describe("home page", () => {
   it("shows evidence, boundaries, and documentation gaps", () => {
     expect(html).toContain("System boundary");
     expect(html).toContain("Snowflake Cortex");
+    expect(html).toContain("PageScript");
+    expect(html).toContain("typed intermediate representation");
     expect(html).toContain("WebSockets");
     expect(html).toContain("2-of-3 quorum");
     expect(html.match(/<strong>TODO<\/strong>/g)).toHaveLength(2);
