@@ -3,11 +3,11 @@ import { site } from "@/data/site";
 export default function SiteFooter() {
   return (
     <footer className="site-footer">
-      <span>{site.location}</span>
+      <span>Toronto, Ontario</span>
       <span>
         © {new Date().getFullYear()} {site.name}
       </span>
-      <a href="https://blog.olivermorrow.com">Writing</a>
+      <a href="#top">Back to top ↑</a>
     </footer>
   );
 }

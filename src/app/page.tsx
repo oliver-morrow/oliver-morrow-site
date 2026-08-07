@@ -6,7 +6,7 @@ import SiteHeader from "@/components/SiteHeader";
 
 export default function Home() {
   return (
-    <div className="site-shell">
+    <div className="site-shell" id="top">
       <SiteHeader />
       <main>
         <Introduction />
