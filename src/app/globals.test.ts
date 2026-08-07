@@ -29,22 +29,19 @@ describe("Quiet Ledger visual surface", () => {
     expect(paperTexture).not.toMatch(/<(?:path|circle)\b/);
   });
 
-  it("balances perceptible grain with compact vertical rhythm", () => {
+  it("balances perceptible grain with a skimmable long-form rhythm", () => {
     expect(globalsCss).toMatch(/body::before\s*{[^}]*opacity:\s*0\.42/);
     expect(globalsCss).toMatch(
-      /main\s*{[^}]*padding-block:\s*clamp\(3\.5rem,\s*7vw,\s*5rem\)/,
+      /main\s*{[^}]*padding-block:\s*clamp\(4rem,\s*9vw,\s*8rem\)/,
     );
     expect(globalsCss).toMatch(
-      /\.introduction\s*{[^}]*margin:\s*0 0 clamp\(3\.75rem,\s*8vw,\s*5\.5rem\)/,
+      /\.hero\s*{[^}]*padding-bottom:\s*clamp\(5rem,\s*10vw,\s*8rem\)/,
     );
     expect(globalsCss).toMatch(
-      /\.section\s*{[^}]*margin-top:\s*3\.25rem/,
+      /\.section\s*{[^}]*margin-top:\s*clamp\(4\.5rem,\s*9vw,\s*7\.5rem\)/,
     );
     expect(globalsCss).toMatch(
-      /@media \(max-width:\s*36rem\)[\s\S]*main\s*{[^}]*padding-block:\s*3\.25rem 3\.75rem/,
-    );
-    expect(globalsCss).toMatch(
-      /@media \(max-width:\s*36rem\)[\s\S]*\.introduction\s*{[^}]*margin-bottom:\s*3\.75rem/,
+      /@media \(max-width:\s*48rem\)[\s\S]*main\s*{[^}]*padding-block:\s*4\.5rem/,
     );
   });
 
@@ -62,5 +59,11 @@ describe("Quiet Ledger visual surface", () => {
     expect(globalsCss).toMatch(/--accent:\s*#[0-9a-f]{6}/i);
     expect(globalsCss).toMatch(/a:focus-visible\s*{[^}]*var\(--accent\)/);
     expect(globalsCss).toMatch(/\.section h2\s*{[^}]*var\(--accent\)/);
+  });
+
+  it("uses restrained evidence-list markers", () => {
+    expect(globalsCss).toMatch(/\.evidence-list\s*{[^}]*list-style:\s*disc/);
+    expect(globalsCss).toMatch(/\.evidence-list li::marker\s*{/);
+    expect(globalsCss).not.toContain("↳");
   });
 });
