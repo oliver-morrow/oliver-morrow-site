@@ -5,34 +5,42 @@ import Home from "@/app/page";
 describe("home page", () => {
   const html = renderToStaticMarkup(<Home />);
 
-  it("renders the approved semantic structure", () => {
+  it("renders the technical portfolio structure", () => {
     expect(html).toContain("<header");
     expect(html).toContain("<main");
-    expect(html).toContain("<h1>Oliver Morrow</h1>");
+    expect(html).toContain('<h1 id="hero-heading">Oliver Morrow</h1>');
     expect(html).toContain('id="work"');
-    expect(html).toContain("Selected work");
-    expect(html).toContain("Previously");
+    expect(html).toContain('id="experience"');
+    expect(html).toContain('id="focus"');
+    expect(html).toContain("What I build");
+    expect(html).toContain("Currently exploring");
+    expect(html).toContain("What I’m looking for");
     expect(html).toContain("<footer");
   });
 
-  it("does not render interactive portfolio machinery", () => {
-    expect(html).not.toMatch(/<button|<form|<canvas|dialog/i);
-    expect(html).not.toMatch(
-      /available for|system status|telemetry|command search/i,
-    );
-  });
-
-  it("uses descriptive text links", () => {
-    expect(html).toContain(">Writing</a>");
+  it("includes the requested links and primary CTA", () => {
     expect(html).toContain(">GitHub</a>");
     expect(html).toContain(">LinkedIn</a>");
+    expect(html).toContain(">Blog</a>");
     expect(html).toContain(">Email</a>");
+    expect(html).toContain(">Resume</a>");
+    expect(html).toContain("View selected work");
   });
 
-  it("exposes stable classes for the document layout", () => {
-    expect(html).toContain('class="site-shell"');
-    expect(html).toContain('class="introduction"');
-    expect(html).toContain('class="work-item"');
-    expect(html).toContain('class="site-footer"');
+  it("shows evidence, boundaries, and documentation gaps", () => {
+    expect(html).toContain("System boundary");
+    expect(html).toContain("Snowflake Cortex");
+    expect(html).toContain("WebSockets");
+    expect(html).toContain("2-of-3 quorum");
+    expect(html.match(/<strong>TODO<\/strong>/g)).toHaveLength(2);
+    expect(html).not.toContain("work-number");
+  });
+
+  it("uses the corrected graduation date and approved dash typography", () => {
+    const emDash = String.fromCodePoint(0x2014);
+
+    expect(html).toContain("April 2027");
+    expect(html).not.toMatch(/Expected\s+2026/);
+    expect(html).not.toContain(emDash);
   });
 });
