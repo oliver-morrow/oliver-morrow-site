@@ -4,7 +4,7 @@ export type SiteLink = {
 };
 
 export type WorkLink = SiteLink & {
-  kind: "Repository" | "Demo" | "Case study";
+  kind: "Repository" | "Demo" | "Case study" | "Documentation" | "Release";
 };
 
 export type ArchitectureStep = {
@@ -70,6 +70,75 @@ export const site = {
         "Airflow",
       ],
       links: [],
+      todos: [],
+    },
+    {
+      context: "Open source · v1.1.0-alpha.1 · Aug 2026",
+      title: "PageScript",
+      summary:
+        "I’m building PageScript, a Rust compiler and CLI that turns compact, validated .page files into standalone HTML. The alpha also renders source-cited architecture and lineage explainers from reviewed evidence bundles.",
+      highlights: [
+        "I built the active reference implementation in Rust: parser, validator, resolver, typed IR compiler, standalone HTML renderer, and native CLI.",
+        "The evidence path keeps reviewed structural claims separate from presentation. JSON Schema validation and a SHA-256-bound Explainer Spec produce offline HTML with path-and-line citations.",
+        "The compiler rejects executable URL schemes, style-tag termination, unresolved or out-of-root imports, and recursive recipe expansion before rendering.",
+        "On the checked-in revenue-map fixture, 1,787 tokens of PageScript compile to 4,975 tokens of standalone HTML: 64.08% fewer authored-artifact tokens under o200k_base.",
+        "The alpha ships checksummed binaries for macOS, Linux, and Windows, with cross-platform CI, package smoke tests, and documentation generated from PageScript source.",
+      ],
+      architecture: [
+        {
+          label: "Authoring",
+          description:
+            "Compact .page source composes typed primitives and reusable standard-library recipes without source-authored JavaScript.",
+        },
+        {
+          label: "Compiler",
+          description:
+            "The Rust parser, resolver, and validator normalize accepted source into a typed intermediate representation.",
+        },
+        {
+          label: "Renderer",
+          description:
+            "The IR compiler emits standalone HTML, CSS, SVG, and a small compiler-generated browser runtime.",
+        },
+        {
+          label: "Evidence",
+          description:
+            "A reviewed Evidence Bundle and digest-bound Explainer Spec produce source-cited architecture or lineage HTML. Repository and dbt extraction are outside the current alpha.",
+        },
+        {
+          label: "Delivery",
+          description:
+            "GitHub Actions test three operating systems, publish the PageScript-authored docs, and attach checksummed binaries to tagged releases.",
+        },
+      ],
+      technologies: [
+        "Rust",
+        "Serde",
+        "JSON Schema",
+        "SHA-256",
+        "HTML",
+        "CSS",
+        "SVG",
+        "GitHub Actions",
+        "GitHub Pages",
+      ],
+      links: [
+        {
+          label: "Read docs",
+          kind: "Documentation",
+          href: "https://oliver-morrow.github.io/pagescript/",
+        },
+        {
+          label: "View source",
+          kind: "Repository",
+          href: "https://github.com/oliver-morrow/pagescript",
+        },
+        {
+          label: "View alpha release",
+          kind: "Release",
+          href: "https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1",
+        },
+      ],
       todos: [],
     },
     {
