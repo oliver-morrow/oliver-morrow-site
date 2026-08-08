@@ -27,14 +27,15 @@ describe("home page", () => {
     expect(html).toContain("View selected work");
   });
 
-  it("shows evidence, boundaries, and documentation gaps", () => {
+  it("shows evidence and system boundaries without drafting scaffolding", () => {
     expect(html).toContain("System boundary");
     expect(html).toContain("Snowflake Cortex");
     expect(html).toContain("PageScript");
     expect(html).toContain("typed intermediate representation");
     expect(html).toContain("WebSockets");
     expect(html).toContain("2-of-3 quorum");
-    expect(html.match(/<strong>TODO<\/strong>/g)).toHaveLength(2);
+    expect(html).not.toContain("TODO");
+    expect(html).not.toContain("what is still missing");
     expect(html).not.toContain("work-number");
   });
 
