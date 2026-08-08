@@ -5,7 +5,7 @@ export default function SelectedWork() {
     <section id="work" aria-labelledby="work-heading" className="section work-section">
       <div className="section-heading-row">
         <h2 id="work-heading">Selected work</h2>
-        <p>What I built, how it works, and what is still missing.</p>
+        <p>What I built and how each system works.</p>
       </div>
 
       <div className="work-list">
@@ -61,16 +61,6 @@ export default function SelectedWork() {
                 ) : null}
               </div>
 
-              {item.todos.length > 0 ? (
-                <aside className="todo-note" aria-label={`${item.title} documentation TODOs`}>
-                  <strong>TODO</strong>
-                  <ul>
-                    {item.todos.map((todo) => (
-                      <li key={todo}>{todo}</li>
-                    ))}
-                  </ul>
-                </aside>
-              ) : null}
             </div>
           </article>
         ))}

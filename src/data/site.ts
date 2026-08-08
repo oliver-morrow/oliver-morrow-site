@@ -20,7 +20,6 @@ export type WorkItem = {
   architecture?: ArchitectureStep[];
   technologies: string[];
   links: WorkLink[];
-  todos: string[];
 };
 
 export type ExperienceItem = {
@@ -70,7 +69,6 @@ export const site = {
         "Airflow",
       ],
       links: [],
-      todos: [],
     },
     {
       context: "Open source · v1.1.0-alpha.1 · Aug 2026",
@@ -139,7 +137,6 @@ export const site = {
           href: "https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1",
         },
       ],
-      todos: [],
     },
     {
       context: "Personal project · Sep 2024–present",
@@ -204,7 +201,6 @@ export const site = {
           href: "/cyclicus/",
         },
       ],
-      todos: [],
     },
     {
       context: "Team project · Sep–Dec 2024",
@@ -250,10 +246,6 @@ export const site = {
           kind: "Demo",
           href: "https://noteworthy.howdoesthiseven.work/",
         },
-      ],
-      todos: [
-        "Make the repository public so website visitors can open the source link.",
-        "Document the original Qt/WebAssembly decision and the intended durable-persistence model.",
       ],
     },
     {
@@ -301,9 +293,6 @@ export const site = {
           kind: "Case study",
           href: "https://blog.olivermorrow.com/posts/home-server",
         },
-      ],
-      todos: [
-        "Add repeatable failover test results, recovery times, and a current network diagram.",
       ],
     },
   ],
