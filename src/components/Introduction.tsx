@@ -4,7 +4,6 @@ export default function Introduction() {
   return (
     <>
       <section className="hero" aria-labelledby="hero-heading">
-        <p className="hero-kicker">Computer engineering · Data, AI, and systems</p>
         <h1 id="hero-heading">{site.name}</h1>
         <p className="hero-headline">{site.headline}</p>
         <p className="hero-introduction">{site.introduction}</p>

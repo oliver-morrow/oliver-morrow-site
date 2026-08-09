@@ -4,10 +4,7 @@ export default function Previously() {
   return (
     <>
       <section id="experience" aria-labelledby="experience-heading" className="section">
-        <div className="section-heading-row">
-          <h2 id="experience-heading">Experience</h2>
-          <p>{site.education}</p>
-        </div>
+        <h2 id="experience-heading" className="section-title">Experience</h2>
         <ol className="experience-list">
           {site.experience.map((item) => (
             <li key={`${item.organization}-${item.period}`}>
@@ -23,10 +20,7 @@ export default function Previously() {
       </section>
 
       <section id="focus" aria-labelledby="focus-heading" className="section">
-        <div className="section-heading-row">
-          <h2 id="focus-heading">Technical focus</h2>
-          <p>Tools grouped by the problems I use them to solve.</p>
-        </div>
+        <h2 id="focus-heading" className="section-title">Technical focus</h2>
         <div className="focus-grid">
           {site.technicalFocus.map((group) => (
             <div className="focus-group" key={group.label}>

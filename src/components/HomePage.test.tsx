@@ -27,8 +27,8 @@ describe("home page", () => {
     expect(html).toContain("View selected work");
   });
 
-  it("shows evidence and system boundaries without drafting scaffolding", () => {
-    expect(html).toContain("System boundary");
+  it("shows concrete project details without drafting scaffolding", () => {
+    expect(html).toContain("How it works");
     expect(html).toContain("Snowflake Cortex");
     expect(html).toContain("PageScript");
     expect(html).toContain("typed intermediate representation");
@@ -43,7 +43,15 @@ describe("home page", () => {
     const emDash = String.fromCodePoint(0x2014);
 
     expect(html).toContain("April 2027");
+    expect(html.match(/B\.A\.Sc\. Computer Engineering/g)).toHaveLength(1);
     expect(html).not.toMatch(/Expected\s+2026/);
     expect(html).not.toContain(emDash);
+  });
+
+  it("uses simple section headings without redundant descriptor bands", () => {
+    expect(html.match(/class="section-title"/g)).toHaveLength(3);
+    expect(html).not.toContain("section-heading-row");
+    expect(html).not.toContain("What I built and how each system works.");
+    expect(html).not.toContain("Tools grouped by the problems I use them to solve.");
   });
 });
