@@ -3,10 +3,7 @@ import { site } from "@/data/site";
 export default function SelectedWork() {
   return (
     <section id="work" aria-labelledby="work-heading" className="section work-section">
-      <div className="section-heading-row">
-        <h2 id="work-heading">Selected work</h2>
-        <p>What I built and how each system works.</p>
-      </div>
+      <h2 id="work-heading" className="section-title">Selected work</h2>
 
       <div className="work-list">
         {site.selectedWork.map((item) => (
@@ -21,7 +18,6 @@ export default function SelectedWork() {
 
             <div className="work-content">
               <div>
-                <h4>Evidence</h4>
                 <ul className="evidence-list">
                   {item.highlights.map((highlight) => (
                     <li key={highlight}>{highlight}</li>
@@ -31,7 +27,7 @@ export default function SelectedWork() {
 
               {item.architecture ? (
                 <div>
-                  <h4>System boundary</h4>
+                  <h4>How it works</h4>
                   <ol className="architecture-list">
                     {item.architecture.map((step) => (
                       <li key={step.label}>

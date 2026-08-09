@@ -2,21 +2,21 @@ import { describe, expect, it } from "vitest";
 import { site } from "./site";
 
 describe("site content", () => {
-  it("uses the approved positioning and availability copy", () => {
+  it("uses direct positioning and accurate availability copy", () => {
     expect(site.headline).toBe(
-      "Computer engineering student building production data and AI systems.",
+      "I build data tools, compilers, and infrastructure.",
     );
-    expect(site.introduction).toContain("Data & AI Engineer Co-op at Sanofi");
+    expect(site.introduction).toContain("Sanofi as a Data & AI Engineer Co-op");
     expect(site.availability).toContain("May 2027");
     expect(site.education).toContain("April 2027");
     expect(`${site.introduction} ${site.whatIBuild}`).not.toMatch(
-      /\bintersection\b|\bstreamline\b|\bpassionate\b|\binnovative\b/i,
+      /\bintersection\b|\bstreamline\b|\bpassionate\b|\binnovative\b|survives contact|trade-offs behind/i,
     );
   });
 
   it("presents the selected systems without unsupported performance claims", () => {
     expect(site.selectedWork.map((item) => item.title)).toEqual([
-      "Enterprise data access and agent workflows",
+      "Planning data and Cortex workflows",
       "PageScript",
       "Cyclicus",
       "Noteworthy",
@@ -33,7 +33,7 @@ describe("site content", () => {
       site.selectedWork.find((item) => item.title === "PageScript")?.highlights.join(" "),
     ).toContain("64.08% fewer authored-artifact tokens");
     expect(site.selectedWork.find((item) => item.title === "Cyclicus")?.summary).toContain(
-      "point-in-time market-sentiment research workbench",
+      "available at a fixed decision time",
     );
   });
 

@@ -32,9 +32,9 @@ export type ExperienceItem = {
 export const site = {
   name: "Oliver Morrow",
   headline:
-    "Computer engineering student building production data and AI systems.",
+    "I build data tools, compilers, and infrastructure.",
   introduction:
-    "I build data and AI systems from the semantic model and business logic through orchestration and deployment. I’m a Data & AI Engineer Co-op at Sanofi, where I’m building Snowflake Cortex agent workflows and governed data pipelines for internal planning products.",
+    "I’m studying computer engineering at Queen’s and currently working at Sanofi as a Data & AI Engineer Co-op.",
   availability:
     "Toronto, Ontario · Available for full-time roles from May 2027",
   education:
@@ -47,18 +47,17 @@ export const site = {
     { label: "Resume", href: "/Oliver-Morrow-Resume.pdf" },
   ],
   whatIBuild:
-    "With Snowflake Cortex, semantic models, SQL, Python, dbt, and Airflow, I make governed internal data easier to query and turn business rules into repeatable workflows.",
+    "At work I use Snowflake Cortex, SQL, Python, dbt, and Airflow. Outside work I’m building PageScript, experimenting with market data, and running a small Proxmox cluster at home.",
   selectedWork: [
     {
       context: "Sanofi · Data & AI Engineering · Sep 2025–present",
-      title: "Enterprise data access and agent workflows",
+      title: "Planning data and Cortex workflows",
       summary:
-        "I build semantic models, pipelines, and agent workflows for internal planning products.",
+        "I build semantic models, data pipelines, and Cortex workflows for internal planning tools.",
       highlights: [
-        "I engineer semantic models and agent workflows using Snowflake Cortex.",
-        "I connect complex SQL business logic to Python workflows for internal portfolio data access.",
-        "I build and manage automated dbt pipelines for internal planning products.",
-        "I work on business-logic automation and CI/CD reliability.",
+        "I connect SQL business logic to Python workflows for internal portfolio data.",
+        "I build and maintain automated dbt pipelines.",
+        "I work on workflow automation and CI/CD reliability.",
       ],
       technologies: [
         "Snowflake Cortex",
@@ -74,13 +73,12 @@ export const site = {
       context: "Open source · v1.1.0-alpha.1 · Aug 2026",
       title: "PageScript",
       summary:
-        "I’m building PageScript, a Rust compiler and CLI that turns compact, validated .page files into standalone HTML. The alpha also renders source-cited architecture and lineage explainers from reviewed evidence bundles.",
+        "PageScript is a Rust compiler and CLI that turns compact .page files into standalone HTML. The alpha also renders source-cited system and lineage diagrams from reviewed JSON.",
       highlights: [
-        "I built the active reference implementation in Rust: parser, validator, resolver, typed IR compiler, standalone HTML renderer, and native CLI.",
-        "The evidence path keeps reviewed structural claims separate from presentation. JSON Schema validation and a SHA-256-bound Explainer Spec produce offline HTML with path-and-line citations.",
-        "The compiler rejects executable URL schemes, style-tag termination, unresolved or out-of-root imports, and recursive recipe expansion before rendering.",
+        "The Rust implementation includes the parser, validator, resolver, typed intermediate representation, HTML renderer, and native CLI.",
         "On the checked-in revenue-map fixture, 1,787 tokens of PageScript compile to 4,975 tokens of standalone HTML: 64.08% fewer authored-artifact tokens under o200k_base.",
-        "The alpha ships checksummed binaries for macOS, Linux, and Windows, with cross-platform CI, package smoke tests, and documentation generated from PageScript source.",
+        "The validator rejects executable URLs, style-tag termination, out-of-root imports, and recursive recipes before rendering.",
+        "The alpha ships checksummed binaries for macOS, Linux, and Windows.",
       ],
       architecture: [
         {
@@ -142,19 +140,17 @@ export const site = {
       context: "Personal project · Sep 2024–present",
       title: "Cyclicus",
       summary:
-        "I rebuilt Cyclicus as a point-in-time market-sentiment research workbench. It tests whether sentiment known at a fixed decision time adds information beyond technical features.",
+        "Cyclicus tests whether market sentiment available at a fixed decision time adds anything beyond technical features.",
       highlights: [
-        "I enforce publication, availability, decision, and label timestamps when building datasets so later information cannot leak into historical forecasts.",
-        "I compare majority, technical-only, sentiment-only, combined logistic, and seeded Random Forest models on the same chronological folds.",
-        "I serialize model results, folds, predictions, timestamps, and lineage into deterministic evidence bundles.",
-        "The same evidence bundle drives a static deployment, a read-only FastAPI API, and a Vue dashboard with model comparison and forecast replay.",
-        "CI runs Python and frontend tests, strict type checks, root and subpath builds, and byte-for-byte evidence regeneration.",
+        "Dataset construction tracks publication, availability, decision, and label timestamps to prevent future information from leaking into old forecasts.",
+        "Majority, technical-only, sentiment-only, logistic, and seeded Random Forest models run on the same chronological folds.",
+        "One deterministic result bundle drives the static demo, read-only FastAPI API, and Vue dashboard.",
       ],
       architecture: [
         {
           label: "Data",
           description:
-            "A deterministic synthetic fixture powers the public demo; the dataset builder enforces source, decision, and label timestamps. Live provider ingestion is intentionally outside the demo’s scope.",
+            "A deterministic synthetic fixture powers the public demo; the dataset builder enforces source, decision, and label timestamps. Live provider ingestion is not part of the public demo.",
         },
         {
           label: "NLP",
@@ -206,12 +202,11 @@ export const site = {
       context: "Team project · Sep–Dec 2024",
       title: "Noteworthy",
       summary:
-        "I worked on a collaborative note-taking application built in C++ and Qt, compiled to WebAssembly for the browser, and deployed with Docker and Nginx. It supports multiple pages, drawing objects, stickers, icons, and bounding-box selection.",
+        "A collaborative whiteboard and note-taking app built with C++ and Qt, compiled to WebAssembly for the browser.",
       highlights: [
-        "The Qt client sends JSON events over WebSockets; the C++ server applies them to room, page, and canvas-object state, then forwards changes to connected collaborators.",
-        "The browser build keeps the C++ and Qt interaction model, but adds WebAssembly payload, browser interop, MIME-type, and cache-control concerns.",
-        "The client and server ship separately: Nginx serves the WebAssembly artifacts, while a containerized C++ service handles HTTP and WebSocket traffic.",
-        "Room and canvas state currently live in server memory during a running session; the source does not document durable recovery after a server restart.",
+        "The client sends JSON events over WebSockets; the C++ server updates room, page, and canvas state, then forwards the change to everyone connected.",
+        "Nginx serves the WebAssembly client while a separate container runs the C++ HTTP and WebSocket service.",
+        "Room and canvas state live in memory, so a server restart currently clears the session.",
       ],
       architecture: [
         {
@@ -252,12 +247,11 @@ export const site = {
       context: "Homelab · Apr 2026",
       title: "Proxmox High-Availability Cluster",
       summary:
-        "I built a three-node Proxmox VE cluster from power-efficient hardware for home automation, DNS, and virtual machines, with a separate Ubuntu GPU host for local inference.",
+        "Three OptiPlex Micro nodes run home automation, DNS, and VMs. A separate Ubuntu machine with an RTX 3070 handles local models.",
       highlights: [
-        "I place broadcast-sensitive home automation services in LXC containers on Node 1, DNS services on Node 2, and virtual machines on Node 3.",
-        "I use three nodes for 2-of-3 quorum, and apply ZFS replication selectively because redundancy costs I/O and usable storage.",
-        "I keep a legacy Windows VM node-bound while configuring critical containers for HA, separating workloads by their actual recovery needs.",
-        "A separate Ubuntu server with an RTX 3070 runs Ollama, keeping GPU work outside the primary hypervisor cluster.",
+        "Home automation runs in LXC containers on Node 1, DNS on Node 2, and virtual machines on Node 3.",
+        "The cluster uses 2-of-3 quorum. I only enable ZFS replication where the recovery time is worth the I/O and storage cost.",
+        "The Windows VM stays on one node; the containers I actually need at home are configured for HA.",
       ],
       architecture: [
         {
@@ -389,9 +383,9 @@ export const site = {
     },
   ],
   currentlyExploring:
-    "I’m testing how agent systems recover when tools, state, or model output fail, and where local inference is worth the operational cost. I use AI-assisted coding for speed, then verify the data model, interfaces, failure modes, and deployment myself.",
+    "I’m working on deterministic repository and dbt extraction for PageScript, and testing when local models are worth running at home.",
   lookingFor:
-    "I’m looking for a team that ships and operates real systems. I’m open to data, AI, software, backend, architecture, and infrastructure roles starting in May 2027, in Toronto or remote.",
+    "I’m looking for a full-time role starting in May 2027, in Toronto or remote. I’m most interested in data, backend, and infrastructure work where I can own what I ship.",
 } satisfies {
   name: string;
   headline: string;

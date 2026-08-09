@@ -66,4 +66,16 @@ describe("Quiet Ledger visual surface", () => {
     expect(globalsCss).toMatch(/\.evidence-list li::marker\s*{/);
     expect(globalsCss).not.toContain("↳");
   });
+
+  it("uses single list rules instead of stacked section framing", () => {
+    const sectionRule = globalsCss.match(/\.section\s*{([^}]*)}/)?.[1] ?? "";
+
+    expect(sectionRule).not.toMatch(/border-top/);
+    expect(globalsCss).toMatch(/\.split-section\s*{[^}]*border-top:/);
+    expect(globalsCss).toMatch(/\.work-list\s*{[^}]*border-top:/);
+    expect(globalsCss).toMatch(/\.work-item \+ \.work-item\s*{[^}]*border-top:/);
+    expect(globalsCss).toMatch(/\.experience-list\s*{[^}]*border-top:/);
+    expect(globalsCss).not.toMatch(/\.experience-list li \+ li\s*{[^}]*border-top:/);
+    expect(globalsCss).not.toContain("section-heading-row");
+  });
 });
