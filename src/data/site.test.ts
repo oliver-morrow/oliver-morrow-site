@@ -18,7 +18,6 @@ describe("site content", () => {
     expect(site.selectedWork.map((item) => item.title)).toEqual([
       "Planning data and Cortex workflows",
       "PageScript",
-      "Cyclicus",
       "Noteworthy",
       "Proxmox High-Availability Cluster",
     ]);
@@ -32,9 +31,6 @@ describe("site content", () => {
     expect(
       site.selectedWork.find((item) => item.title === "PageScript")?.highlights.join(" "),
     ).toContain("64.08% fewer authored-artifact tokens");
-    expect(site.selectedWork.find((item) => item.title === "Cyclicus")?.summary).toContain(
-      "available at a fixed decision time",
-    );
   });
 
   it("contains no empty or malformed configured links", () => {

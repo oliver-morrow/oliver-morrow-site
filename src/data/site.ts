@@ -137,68 +137,6 @@ export const site = {
       ],
     },
     {
-      context: "Personal project · Sep 2024–present",
-      title: "Cyclicus",
-      summary:
-        "Cyclicus tests whether market sentiment available at a fixed decision time adds anything beyond technical features.",
-      highlights: [
-        "Dataset construction tracks publication, availability, decision, and label timestamps to prevent future information from leaking into old forecasts.",
-        "Majority, technical-only, sentiment-only, logistic, and seeded Random Forest models run on the same chronological folds.",
-        "One deterministic result bundle drives the static demo, read-only FastAPI API, and Vue dashboard.",
-      ],
-      architecture: [
-        {
-          label: "Data",
-          description:
-            "A deterministic synthetic fixture powers the public demo; the dataset builder enforces source, decision, and label timestamps. Live provider ingestion is not part of the public demo.",
-        },
-        {
-          label: "NLP",
-          description:
-            "An optional FinBERT adapter handles financial text. The checked-in demo uses a deterministic lexicon scorer.",
-        },
-        {
-          label: "Models",
-          description:
-            "Technical and sentiment ablations, logistic regression, and a seeded Random Forest run on matched chronological folds.",
-        },
-        {
-          label: "API",
-          description:
-            "FastAPI exposes immutable evidence bundles through read-only showcase and run-detail endpoints.",
-        },
-        {
-          label: "Frontend",
-          description:
-            "Vue, TypeScript, Tailwind CSS, and ECharts present comparisons, integrity checks, lineage, and forecast replay.",
-        },
-      ],
-      technologies: [
-        "Python",
-        "pandas",
-        "scikit-learn",
-        "FinBERT",
-        "FastAPI",
-        "Vue.js",
-        "TypeScript",
-        "Tailwind CSS",
-        "ECharts",
-        "Docker",
-      ],
-      links: [
-        {
-          label: "View source",
-          kind: "Repository",
-          href: "https://github.com/oliver-morrow/trading-sentiment",
-        },
-        {
-          label: "Open demo",
-          kind: "Demo",
-          href: "/cyclicus/",
-        },
-      ],
-    },
-    {
       context: "Team project · Sep–Dec 2024",
       title: "Noteworthy",
       summary:
