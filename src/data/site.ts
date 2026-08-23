@@ -27,16 +27,17 @@ export type ExperienceItem = {
   organization: string;
   role: string;
   description: string;
+  highlights?: string[];
+  technologies?: string[];
 };
 
 export const site = {
   name: "Oliver Morrow",
-  headline:
-    "I build data tools, compilers, and infrastructure.",
+  headline: "I build data tools, compilers, and infrastructure.",
   introduction:
-    "I’m studying computer engineering at Queen’s and currently working at Sanofi as a Data & AI Engineer Co-op.",
+    "Computer Engineering student at Queen’s (April 2027). Data & AI Engineering co-op at Sanofi in Toronto.",
   availability:
-    "Toronto, Ontario · Available for full-time roles from May 2027",
+    "Available for full-time roles starting May 2027 (Toronto / GTA or remote), focused on data engineering, analytics engineering, and platform-adjacent software engineering.",
   education:
     "B.A.Sc. Computer Engineering, Queen’s University · Graduating April 2027",
   links: [
@@ -47,137 +48,46 @@ export const site = {
     { label: "Resume", href: "/Oliver-Morrow-Resume.pdf" },
   ],
   whatIBuild:
-    "At work I use Snowflake Cortex, SQL, Python, dbt, and Airflow. Outside work I’m building PageScript, experimenting with market data, and running a small Proxmox cluster at home.",
+    "At work: Snowflake, Cortex, SQL, Python, dbt, and Airflow for internal data foundations and production LLM agents. Outside work: PageScript (a Rust compile pipeline for .page to HTML), a Proxmox HA home lab, and systems experiments.",
   selectedWork: [
     {
-      context: "Sanofi · Data & AI Engineering · Sep 2025–present",
-      title: "Planning data and Cortex workflows",
-      summary:
-        "I build semantic models, data pipelines, and Cortex workflows for internal planning tools.",
-      highlights: [
-        "I connect SQL business logic to Python workflows for internal portfolio data.",
-        "I build and maintain automated dbt pipelines.",
-        "I work on workflow automation and CI/CD reliability.",
-      ],
-      technologies: [
-        "Snowflake Cortex",
-        "Snowflake",
-        "SQL",
-        "Python",
-        "dbt",
-        "Airflow",
-      ],
-      links: [],
-    },
-    {
-      context: "Open source · v1.1.0-alpha.1 · Aug 2026",
+      context: "Personal project · 2026",
       title: "PageScript",
       summary:
-        "PageScript is a Rust compiler and CLI that turns compact .page files into standalone HTML. The alpha also renders source-cited system and lineage diagrams from reviewed JSON.",
+        "Designed a compact .page language and compile pipeline from parsing to typed IR to safe HTML, with no source-authored inline JavaScript. The Rust CLI aims to keep authored source smaller than hand-written pages.",
       highlights: [
-        "The Rust implementation includes the parser, validator, resolver, typed intermediate representation, HTML renderer, and native CLI.",
-        "On the checked-in revenue-map fixture, 1,787 tokens of PageScript compile to 4,975 tokens of standalone HTML: 64.08% fewer authored-artifact tokens under o200k_base.",
-        "The validator rejects executable URLs, style-tag termination, out-of-root imports, and recursive recipes before rendering.",
-        "The alpha ships checksummed binaries for macOS, Linux, and Windows.",
+        "Designed the architecture, language, and compiler boundaries; implementation was AI-assisted.",
+        "The compile path separates parsing, validation, typed intermediate representation, and safe HTML rendering.",
+        "Source files declare the page while the compiler owns the browser output and runtime.",
       ],
       architecture: [
         {
           label: "Authoring",
           description:
-            "Compact .page source composes typed primitives and reusable standard-library recipes without source-authored JavaScript.",
+            "Compact .page source describes the document with typed primitives and reusable recipes.",
         },
         {
-          label: "Compiler",
+          label: "Typed IR",
           description:
-            "The Rust parser, resolver, and validator normalize accepted source into a typed intermediate representation.",
+            "Parsing and validation normalize accepted source behind a typed compiler boundary.",
         },
         {
-          label: "Renderer",
+          label: "Safe HTML",
           description:
-            "The IR compiler emits standalone HTML, CSS, SVG, and a small compiler-generated browser runtime.",
-        },
-        {
-          label: "Evidence",
-          description:
-            "A reviewed Evidence Bundle and digest-bound Explainer Spec produce source-cited architecture or lineage HTML. Repository and dbt extraction are outside the current alpha.",
-        },
-        {
-          label: "Delivery",
-          description:
-            "GitHub Actions test three operating systems, publish the PageScript-authored docs, and attach checksummed binaries to tagged releases.",
+            "The renderer emits standalone HTML without accepting source-authored inline JavaScript.",
         },
       ],
-      technologies: [
-        "Rust",
-        "Serde",
-        "JSON Schema",
-        "SHA-256",
-        "HTML",
-        "CSS",
-        "SVG",
-        "GitHub Actions",
-        "GitHub Pages",
-      ],
+      technologies: ["Rust", "HTML", "CSS", "GitHub Actions"],
       links: [
         {
-          label: "Read docs",
-          kind: "Documentation",
-          href: "https://oliver-morrow.github.io/pagescript/",
+          label: "Read the case study",
+          kind: "Case study",
+          href: "https://blog.olivermorrow.com/posts/building-pagescript/",
         },
         {
           label: "View source",
           kind: "Repository",
           href: "https://github.com/oliver-morrow/pagescript",
-        },
-        {
-          label: "View alpha release",
-          kind: "Release",
-          href: "https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1",
-        },
-      ],
-    },
-    {
-      context: "Team project · Sep–Dec 2024",
-      title: "Noteworthy",
-      summary:
-        "A collaborative whiteboard and note-taking app built with C++ and Qt, compiled to WebAssembly for the browser.",
-      highlights: [
-        "The client sends JSON events over WebSockets; the C++ server updates room, page, and canvas state, then forwards the change to everyone connected.",
-        "Nginx serves the WebAssembly client while a separate container runs the C++ HTTP and WebSocket service.",
-        "Room and canvas state live in memory, so a server restart currently clears the session.",
-      ],
-      architecture: [
-        {
-          label: "Client",
-          description: "Qt widgets and graphics-scene code compiled to WebAssembly.",
-        },
-        {
-          label: "Collaboration",
-          description:
-            "Event-based room updates over Qt WebSockets and a C++ WebSocket server.",
-        },
-        {
-          label: "State",
-          description:
-            "In-memory room, page, user, and canvas-object maps with JSON serialization.",
-        },
-        {
-          label: "Deployment",
-          description:
-            "Separate Docker images for the C++ service and Nginx-hosted WebAssembly client.",
-        },
-      ],
-      technologies: ["C++", "Qt", "WebAssembly", "Docker", "Nginx", "WebSockets"],
-      links: [
-        {
-          label: "View source",
-          kind: "Repository",
-          href: "https://github.com/oliver-morrow/Noteworthy",
-        },
-        {
-          label: "Open live demo",
-          kind: "Demo",
-          href: "https://noteworthy.howdoesthiseven.work/",
         },
       ],
     },
@@ -185,45 +95,88 @@ export const site = {
       context: "Homelab · Apr 2026",
       title: "Proxmox High-Availability Cluster",
       summary:
-        "Three OptiPlex Micro nodes run home automation, DNS, and VMs. A separate Ubuntu machine with an RTX 3070 handles local models.",
+        "A three-node Proxmox HA lab for home automation, DNS, and virtualized workloads.",
       highlights: [
-        "Home automation runs in LXC containers on Node 1, DNS on Node 2, and virtual machines on Node 3.",
-        "The cluster uses 2-of-3 quorum. I only enable ZFS replication where the recovery time is worth the I/O and storage cost.",
-        "The Windows VM stays on one node; the containers I actually need at home are configured for HA.",
+        "HomeKit Secure Video and Pi-hole containers fail over on node loss with a measured recovery of about 118 seconds.",
+        "A three-node quorum keeps the cluster available through one node loss.",
+        "Docker and Linux services run behind a reverse proxy.",
       ],
       architecture: [
         {
-          label: "Node 1",
-          description: "LXC containers for Homebridge, Scrypted, and Sonos services.",
+          label: "Cluster",
+          description:
+            "Three Proxmox nodes coordinate membership, quorum, and workload recovery.",
         },
         {
-          label: "Node 2",
-          description: "Pi-hole DNS with configuration replicated to a secondary instance.",
+          label: "Services",
+          description:
+            "HomeKit Secure Video, Pi-hole, and other home services run in isolated containers.",
         },
         {
-          label: "Node 3",
-          description: "Virtual machines, including a node-bound Windows workload.",
-        },
-        {
-          label: "GPU host",
-          description: "Bare-metal Ubuntu and Ollama for local LLM inference.",
+          label: "Failover",
+          description:
+            "Replicated services restart on a surviving node after a node failure.",
         },
       ],
       technologies: [
-        "Proxmox VE",
-        "Debian",
-        "Ubuntu",
-        "LXC",
-        "ZFS",
-        "Corosync",
+        "Proxmox",
+        "Docker",
+        "Linux",
+        "High availability",
+        "Reverse proxy",
         "Pi-hole",
-        "Ollama",
       ],
       links: [
         {
-          label: "Read the architecture notes",
+          label: "Read the case study",
           kind: "Case study",
-          href: "https://blog.olivermorrow.com/posts/home-server",
+          href: "https://blog.olivermorrow.com/posts/home-server/",
+        },
+      ],
+    },
+    {
+      context: "Team project · Sep–Dec 2024",
+      title: "Noteworthy",
+      summary:
+        "A collaborative note-taking app built with C++ and Qt, then compiled to WebAssembly for the browser.",
+      highlights: [
+        "The live demo supported about 30 concurrent users.",
+        "WebAssembly integration was the hardest completed piece; durable persistence remains an explicit constraint.",
+        "Room and canvas state currently live in memory and are lost when the server restarts.",
+        "Docker and Nginx package and serve the browser client and collaboration service.",
+      ],
+      architecture: [
+        {
+          label: "Client",
+          description: "A C++ and Qt interface compiled to WebAssembly.",
+        },
+        {
+          label: "Collaboration",
+          description:
+            "JSON events synchronize room and note changes between connected users.",
+        },
+        {
+          label: "State",
+          description:
+            "Room, page, user, and canvas state currently live in the server process.",
+        },
+        {
+          label: "Delivery",
+          description:
+            "Docker packages the services and Nginx serves the WebAssembly client.",
+        },
+      ],
+      technologies: ["C++", "Qt", "WebAssembly", "Docker", "Nginx"],
+      links: [
+        {
+          label: "Open live demo",
+          kind: "Demo",
+          href: "https://noteworthy.howdoesthiseven.work/",
+        },
+        {
+          label: "View source",
+          kind: "Repository",
+          href: "https://github.com/oliver-morrow/Noteworthy",
         },
       ],
     },
@@ -234,96 +187,105 @@ export const site = {
       organization: "Sanofi",
       role: "Data & AI Engineer Co-op",
       description:
-        "I build semantic models, agent workflows, and automated data pipelines for internal planning products.",
+        "Builds semantic models, LLM agents, and automated pipelines on Snowflake for internal planning and operations data.",
+      highlights: [
+        "Led an internal LLM writeback agent end to end, with architecture reviewed by senior engineering: containerized Python services post structured updates into ServiceNow under deterministic and LLM relevance guardrails.",
+        "Built the majority of Snowflake Cortex semantic models on a shared portfolio data foundation; ran knowledge-transfer sessions for full-time engineers; production agent traffic averages about 1,500 queries per week.",
+        "Built dbt pipelines and Streamlit-in-Snowflake tooling for a company license-optimization platform covering a roughly 100,000-person workforce; led a workstream tracking application cost-center migrations for inactive-license cleanup.",
+        "Cut data-foundation refresh from 45 to 30 minutes; dbt and Airflow pipelines keep ServiceNow context at 30-minute freshness and Jira at 45 minutes.",
+        "Shipped internal tooling so the team updates agent skills through an issue-to-automated-PR workflow, plus CI on tagged dbt model diffs.",
+      ],
+      technologies: [
+        "Python",
+        "SQL",
+        "Snowflake Cortex",
+        "Snowpark",
+        "Streamlit",
+        "Snowflake Tasks",
+        "dbt",
+        "Airflow",
+        "ServiceNow APIs",
+        "GitHub Actions",
+      ],
     },
     {
       period: "Jun–Aug 2025",
       organization: "Tilray Brands",
       role: "Data & Analytics Intern",
-      description:
-        "I analyzed sales and operations data with SQL and Python, then built Power BI dashboards and automated reporting tools.",
+      description: "Built demand-planning analytics for the forecast team.",
+      highlights: [
+        "Built demand-planning dashboards under cannabis shelf-life rules, with planning horizons from months to years.",
+        "Surfaced seasonal demand patterns from historical sales that the forecast team still uses.",
+      ],
+      technologies: ["SQL", "Python", "Power BI"],
     },
     {
       period: "May 2024–Apr 2025",
-      organization: "Queen’s University",
+      organization: "Smith Engineering, Queen’s University",
       role: "Electronics I Course Developer",
       description:
-        "I created LTSpice and LaTeX lab content, supported 200+ students, and documented circuit-debugging procedures.",
-    },
-    {
-      period: "May–Aug 2024",
-      organization: "Queen’s University Digital Classrooms",
-      role: "Digital Classrooms Intern",
-      description:
-        "I improved classroom hardware and software infrastructure and the processes used to support it.",
+        "Authored new BJT and MOSFET labs and improved the transformer lab with Dr. Brian Frank using LTSpice and LaTeX for more than 200 ECE students.",
     },
     {
       period: "May–Sep 2023",
       organization: "Legal Aid Ontario",
       role: "IT Analyst Intern",
-      description:
-        "I worked with Azure, VMware, and Citrix, and built a knowledge base, employee training videos, and an inventory management system.",
+      description: "Modernized internal IT inventory and support workflows.",
+      highlights: [
+        "Replaced a legacy on-premises inventory system from around 1999 with a modern workflow for laptops and peripherals.",
+        "Shipped a support knowledge base and training content for common fixes.",
+      ],
+      technologies: ["Azure", "VMware", "Citrix"],
     },
+  ],
+  leadership: [
     {
       period: "Apr 2023–Apr 2024",
       organization: "Engineering Society of Queen’s University",
       role: "IT Operations Team Manager",
       description:
-        "I directed IT operations across Azure maintenance, ticket response, and user management.",
+        "Owned Azure accounts, WordPress, and the EngSoc shop backend for real-money sales; hired and delegated a team after starting at about 10 tickets per week.",
     },
     {
       period: "Jan 2023–Jan 2024",
       organization: "Ontario Engineering Competition 2024",
       role: "VP Communications",
       description:
-        "I led stakeholder communications and logistics for 300+ competitors.",
+        "Led communications for more than 300 competitors, coordinated live logistics when buses failed for about 150 students, and chaired the formal process for a cheating investigation.",
     },
   ],
   technicalFocus: [
     {
       label: "Languages",
-      items: ["Python", "C", "C++", "Java", "SQL", "Bash", "Rust", "Go"],
+      items: ["Python", "SQL", "C", "C++", "Bash", "Java"],
     },
     {
-      label: "Data and AI",
+      label: "Data and platforms",
       items: [
-        "Snowflake",
-        "Snowflake Cortex",
+        "Snowflake (Cortex, Snowpark, Streamlit, Tasks)",
         "dbt",
         "Airflow",
-        "Power BI",
-        "BERT-based NLP",
-        "Machine learning",
-      ],
-    },
-    {
-      label: "Systems and infrastructure",
-      items: [
-        "Linux",
         "Docker",
+        "Linux",
         "Git",
+        "ServiceNow APIs",
+        "Power BI",
         "Proxmox",
-        "Azure",
-        "VMware",
-        "Citrix",
-        "Nginx",
       ],
     },
     {
-      label: "Embedded and hardware",
-      items: [
-        "ROS",
-        "LTSpice",
-        "Computer architecture",
-        "AV-over-IP",
-        "Networking",
-      ],
+      label: "Additional experience",
+      items: ["Azure", "VMware", "Citrix", "Nginx", "LTSpice", "AV-over-IP"],
     },
   ],
   currentlyExploring:
-    "I’m working on deterministic repository and dbt extraction for PageScript, and testing when local models are worth running at home.",
-  lookingFor:
-    "I’m looking for a full-time role starting in May 2027, in Toronto or remote. I’m most interested in data, backend, and infrastructure work where I can own what I ship.",
+    "I’m continuing PageScript’s deterministic extraction work and using the Proxmox lab for systems and infrastructure experiments.",
+  lookingFor: [
+    "Full-time role starting May 2027, Toronto / GTA or remote",
+    "Primary: data engineering, analytics engineering, and data platform work",
+    "Also: platform-adjacent software engineering and internal tools with real ownership",
+    "Longer-term interest in systems and infrastructure, learning in public without claiming production Rust experience",
+  ],
 } satisfies {
   name: string;
   headline: string;
@@ -334,7 +296,8 @@ export const site = {
   whatIBuild: string;
   selectedWork: WorkItem[];
   experience: ExperienceItem[];
+  leadership: ExperienceItem[];
   technicalFocus: { label: string; items: string[] }[];
   currentlyExploring: string;
-  lookingFor: string;
+  lookingFor: string[];
 };

@@ -45,3 +45,5 @@ next-env.d.ts
 
 # isolated feature worktrees
 /.worktrees/
+*.tex
+/olivermorrow-com-content-pack.md
