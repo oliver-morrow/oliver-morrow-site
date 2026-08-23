@@ -78,4 +78,10 @@ describe("Quiet Ledger visual surface", () => {
     expect(globalsCss).not.toMatch(/\.experience-list li \+ li\s*{[^}]*border-top:/);
     expect(globalsCss).not.toContain("section-heading-row");
   });
+
+  it("balances an odd final technical-focus group across the ledger", () => {
+    expect(globalsCss).toMatch(
+      /\.focus-group:last-child:nth-child\(odd\)\s*{[^}]*grid-column:\s*1\s*\/\s*-1/,
+    );
+  });
 });

@@ -11,6 +11,7 @@ describe("home page", () => {
     expect(html).toContain('<h1 id="hero-heading">Oliver Morrow</h1>');
     expect(html).toContain('id="work"');
     expect(html).toContain('id="experience"');
+    expect(html).toContain('id="leadership"');
     expect(html).toContain('id="focus"');
     expect(html).toContain("What I build");
     expect(html).toContain("Currently exploring");
@@ -27,16 +28,22 @@ describe("home page", () => {
     expect(html).toContain("View selected work");
   });
 
-  it("shows concrete project details without drafting scaffolding", () => {
+  it("shows concrete, public-safe work evidence without drafting scaffolding", () => {
     expect(html).toContain("How it works");
     expect(html).toContain("Snowflake Cortex");
     expect(html).toContain("PageScript");
     expect(html).toContain("typed intermediate representation");
-    expect(html).toContain("WebSockets");
-    expect(html).toContain("2-of-3 quorum");
+    expect(html).toContain("AI-assisted");
+    expect(html).toContain("118 seconds");
+    expect(html).toContain("30 concurrent users");
+    expect(html).toContain("1,500 queries per week");
+    expect(html).toContain('class="experience-highlights"');
+    expect(html).toContain('class="looking-list"');
     expect(html).not.toContain("TODO");
     expect(html).not.toContain("what is still missing");
     expect(html).not.toContain("work-number");
+    expect(html).not.toMatch(/License Patrol|Digital Portfolio/);
+    expect(html).not.toMatch(/thumbnail-(?:pagescript|proxmox)/);
   });
 
   it("uses the corrected graduation date and approved dash typography", () => {
@@ -49,7 +56,7 @@ describe("home page", () => {
   });
 
   it("uses simple section headings without redundant descriptor bands", () => {
-    expect(html.match(/class="section-title"/g)).toHaveLength(3);
+    expect(html.match(/class="section-title"/g)).toHaveLength(4);
     expect(html).not.toContain("section-heading-row");
     expect(html).not.toContain("What I built and how each system works.");
     expect(html).not.toContain("Tools grouped by the problems I use them to solve.");

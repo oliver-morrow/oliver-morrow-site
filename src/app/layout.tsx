@@ -5,9 +5,9 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
 export const metadata: Metadata = {
-  title: "Oliver Morrow · Data, AI, Software, and Infrastructure Engineering",
+  title: "Oliver Morrow · Data & AI Engineering",
   description:
-    "Oliver Morrow builds data, AI, backend, and infrastructure systems.",
+    "Computer Engineering student and Data & AI Engineering co-op focused on data engineering, analytics engineering, and platform-adjacent software engineering.",
 };
 
 export default function RootLayout({
