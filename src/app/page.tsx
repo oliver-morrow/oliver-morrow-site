@@ -1,7 +1,7 @@
 function Links() {
   return (
     <nav className="links" aria-label="Find me">
-      <a href="mailto:me@olivermorrow.com">Email</a>
+      <a href="mailto:oliver@olivermorrow.com">Email</a>
       <a href="/Oliver-Morrow-Resume.pdf">Résumé</a>
       <a href="https://github.com/oliver-morrow">GitHub</a>
       <a href="https://linkedin.com/in/oliver-morrow">LinkedIn</a>
@@ -72,7 +72,7 @@ export default function Home() {
         </section>
         <footer id="contact" className="closing">
           I’m looking for full-time roles in data or software engineering starting
-          in May 2027, in Toronto or remotely. <a href="mailto:me@olivermorrow.com">Get in touch.</a>
+          in May 2027, in Toronto or remotely. <a href="mailto:oliver@olivermorrow.com">Get in touch.</a>
         </footer>
       </main>
     </>

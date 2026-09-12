@@ -33,7 +33,7 @@ describe("home page", () => {
 
   it("links to the résumé and public project sources without the retired demo", () => {
     expect(html).toContain('href="/Oliver-Morrow-Resume.pdf"');
-    expect(html).toContain('href="mailto:me@olivermorrow.com"');
+    expect(html).toContain('href="mailto:oliver@olivermorrow.com"');
     expect(html).toContain('href="https://github.com/oliver-morrow/Noteworthy"');
     expect(html).toContain("AI-assisted");
     expect(html).not.toContain("noteworthy.howdoesthiseven.work");
