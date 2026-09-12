@@ -15,7 +15,7 @@ describe("Cloudflare Pages deployment", () => {
     expect(redirects.trim().split("\n")).toEqual([
       "/work /#work 301",
       "/case-studies /#work 301",
-      "/about / 301",
+      "/about /#about 301",
       "/cyclicus /cyclicus/ 301",
     ]);
   });
