@@ -1,20 +1,33 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Oliver Morrow · Data & AI Engineering",
   description:
-    "Computer Engineering student and Data & AI Engineering co-op focused on data engineering, analytics engineering, and platform-adjacent software engineering.",
+    "Computer Engineering at Queen’s University and Data & AI Engineering co-op at Sanofi. Work, personal projects, and contact information. Graduating April 2027.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={geist.variable}>
+    <html
+      lang="en"
+      className={`${sourceSerif.variable} ${sourceSans.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

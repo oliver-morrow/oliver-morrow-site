@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/.lighthouseci/
 
 # next.js
 /.next/
@@ -30,8 +33,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env.local
+# local environment files
+.env
+.env.*
 
 # vercel
 .vercel
@@ -40,8 +44,16 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local config
-.claude
+# local agent and editor configuration
+.claude/
+.codex/
+.cursor/
+.agents/
+.vscode/
+.idea/
+.mcp.json
+.cursorrules
+*.code-workspace
 
 # isolated feature worktrees
 /.worktrees/
