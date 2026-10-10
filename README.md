@@ -34,3 +34,10 @@ The site is deployed as a static export on Cloudflare Pages:
 
 No application environment variables are required. Legacy route redirects are
 defined in `public/_redirects` and copied into the static export.
+
+## Updating the homepage
+
+Edit the copy and links in `src/app/page.tsx` and the styles in
+`src/app/globals.css`. The homepage follows the visitor's light or dark appearance
+and groups employment, projects, earlier work, and writing into labelled sections.
+The full employment timeline lives in the linked résumé.
