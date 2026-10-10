@@ -2,6 +2,8 @@ name: CI / Quality Gate
 on:
   push:
     branches: [dev]
+  pull_request:
+    branches: [dev]
 jobs:
   quality-check:
     runs-on: ubuntu-latest
@@ -15,11 +17,31 @@ jobs:
           cache: 'npm'
       - name: 📦 Install Dependencies
         run: npm ci
+      - name: 🎭 Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: 🧪 Unit Tests
+        run: npm test
       - name: 🧹 Lint Check
         run: npm run lint
       - name: 📐 Type Check
         run: npx tsc --noEmit
       - name: 🏗️ Build Test
         run: npm run build
-        env:
-          RESEND_API_KEY: "dummy_key_for_build"
+      - name: ♿ Browser and accessibility checks
+        run: npm run test:browser
+      - name: 🚦 Lighthouse budgets
+        run: npm run test:performance
+      - name: 📸 Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+      - name: 📊 Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-lighthouse-report
+          path: .lighthouseci/
+          if-no-files-found: ignore

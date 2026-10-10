@@ -13,7 +13,7 @@ describe("home page", () => {
     const headings = [...html.matchAll(/<h2[^>]*>([^<]+)<\/h2>/g)].map(
       (match) => match[1],
     );
-    expect(headings).toEqual(["At work", "Outside work"]);
+    expect(headings).toEqual(["At work", "Projects", "Earlier work", "Writing"]);
     expect(html).not.toMatch(/<details|Compare homepage drafts|variant=/);
     expect(html.indexOf("Sanofi")).toBeLessThan(html.indexOf("PageScript"));
   });
